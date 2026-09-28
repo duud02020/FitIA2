@@ -49,9 +49,16 @@ async function api(req, res, url) {
       return send(res, 201, { user: safeUser(user) }, { 'Set-Cookie': `fitia_session=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=604800` });
     }
     if (req.method === 'POST' && url.pathname === '/api/auth/login') {
-      const { email, password } = await readBody(req); const user = readJson(usersFile, []).find(item => item.email === String(email || '').trim().toLowerCase());
-      if (!user || !crypto.timingSafeEqual(Buffer.from(hashPassword(String(password || ''), user.salt)), Buffer.from(user.password))) return send(res, 401, { error: 'Email ou senha incorretos.' });
-      const token = crypto.randomUUID(); sessions.set(token, user.id);
+      const { email, password } = await readBody(req);
+      const user = readJson(usersFile, []).find(item => item.email === String(email || '').trim().toLowerCase());
+      if (!user) return send(res, 401, { error: 'Email ou senha incorretos.' });
+      const computed = Buffer.from(hashPassword(String(password || ''), user.salt));
+      const stored = Buffer.from(user.password || '');
+      if (computed.length !== stored.length || !crypto.timingSafeEqual(computed, stored)) {
+        return send(res, 401, { error: 'Email ou senha incorretos.' });
+      }
+      const token = crypto.randomUUID();
+      sessions.set(token, user.id);
       return send(res, 200, { user: safeUser(user) }, { 'Set-Cookie': `fitia_session=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=604800` });
     }
     if (req.method === 'POST' && url.pathname === '/api/auth/logout') { const token = parseCookies(req).fitia_session; sessions.delete(token); return send(res, 200, { ok: true }, { 'Set-Cookie': 'fitia_session=; HttpOnly; Path=/; Max-Age=0' }); }

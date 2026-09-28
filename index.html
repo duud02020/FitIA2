@@ -23,11 +23,11 @@
         <div class="sidebar-spacer"></div>
         <div class="pro-card"><span class="spark">✦</span><strong>Desbloqueie seu potencial</strong><p>Tenha acesso a planos personalizados.</p><button class="text-button">Conhecer Fit.IA Pro <span>→</span></button></div>
         <a class="nav-link muted" href="#configuracoes" data-route="configuracoes"><span class="nav-icon">⚙</span>Configurações</a>
-        <button class="profile-mini" id="profileButton"><span class="avatar">JS</span><span class="profile-info"><strong>João Silva</strong><small>Plano gratuito</small></span><span class="more">•••</span></button>
+        <button class="profile-mini" id="profileButton" aria-label="Conta do usuário"><span class="avatar" id="sidebarAvatar">JS</span><span class="profile-info"><strong id="sidebarName">João Silva</strong><small id="sidebarRole">Plano gratuito</small></span><span class="more" id="sidebarAction">•••</span></button>
       </aside>
 
       <main class="content">
-        <header class="topbar"><button class="mobile-menu" id="mobileMenu" aria-label="Abrir menu">☰</button><div class="breadcrumbs"><span>Workspace</span><b>/</b><strong id="pageName">Visão geral</strong></div><div class="top-actions"><button class="icon-button" aria-label="Notificações">♧<i></i></button><button class="outline-button" id="loginButton"><span>↗</span> Entrar</button></div></header>
+        <header class="topbar"><button class="mobile-menu" id="mobileMenu" aria-label="Abrir menu">☰</button><div class="breadcrumbs"><span>Workspace</span><b>/</b><strong id="pageName">Visão geral</strong></div><div class="top-actions"><button class="icon-button" aria-label="Notificações">♧<i></i></button><button class="outline-button" id="loginButton"><span id="loginButtonIcon">↗</span> <span id="loginButtonLabel">Entrar</span></button></div></header>
 
         <section class="view active-view" id="view-inicio">
           <div class="welcome-row"><div><p class="eyebrow">SEGUNDA-FEIRA, 28 DE SETEMBRO</p><h1>Bom dia, João <span>✦</span></h1><p class="subheading">Pronto para dar mais um passo hoje?</p></div><button class="primary-button" data-scroll="treinos"><span>＋</span> Novo treino</button></div>
@@ -45,7 +45,197 @@
       </main>
     </div>
 
-    <div class="modal-backdrop open" id="loginModal"><div class="login-modal"><button class="close-modal" id="closeModal" aria-label="Fechar login">×</button><div class="login-showcase"><strong>Fit<span>.IA</span></strong><p>Seu treino. Sua evolução.<br />Seu melhor ritmo.</p><i class="shape shape-top"></i><i class="shape shape-bottom"></i></div><div class="login-content"><div class="login-brand"><span class="brand-mark">F</span> Fit<span class="brand-dot">.IA</span></div><p class="eyebrow">BEM-VINDO DE VOLTA</p><h2>Entre para treinar.</h2><p class="modal-copy">Acompanhe sua evolução todos os dias.</p><form id="loginForm" novalidate><div class="form-field"><label for="loginEmail">E-mail</label><div class="input-wrap"><span class="input-icon" aria-hidden="true">@</span><input id="loginEmail" type="email" autocomplete="email" placeholder="seu@email.com" required /></div><small class="field-error" id="emailError" aria-live="polite"></small></div><div class="form-field"><div class="field-label-row"><label for="loginPassword">Senha</label><a href="#" id="forgotPassword">Esqueci minha senha</a></div><div class="input-wrap"><span class="input-icon" aria-hidden="true">●</span><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Sua senha" required /><button class="password-toggle" type="button" id="togglePassword" aria-label="Exibir senha" aria-pressed="false"><span id="passwordEye">◉</span></button></div><small class="field-error" id="passwordError" aria-live="polite"></small></div><p class="form-status" id="loginStatus" role="alert" aria-live="polite"></p><button class="primary-button full login-submit" type="submit"><span class="button-label">Entrar</span><span class="button-spinner" aria-hidden="true"></span><span class="button-arrow">→</span></button></form><div class="divider"><span>ou continue com</span></div><button class="social-button" type="button">G <span>Continuar com Google</span></button><p class="signup">Ainda não tem conta? <a href="#">Criar uma agora</a></p></div></div></div>
+    <div class="modal-backdrop open" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <div class="login-modal">
+        <button class="close-modal" id="closeModal" aria-label="Fechar janela de autenticação">×</button>
+
+        <!-- LADO ESQUERDO: APRESENTAÇÃO FIT.IA -->
+        <aside class="login-showcase">
+          <div class="showcase-decor" aria-hidden="true">
+            <span class="shape shape-top"></span>
+            <span class="shape shape-bottom"></span>
+          </div>
+
+          <div class="showcase-content">
+            <div class="showcase-badge">
+              <span class="spark">✦</span> Fit.IA Treinos &amp; Hábitos
+            </div>
+
+            <div class="showcase-brand">
+              <span class="brand-mark">F</span>
+              <strong>Fit<span class="brand-dot">.IA</span></strong>
+            </div>
+
+            <p class="showcase-slogan">Treine no seu ritmo, construa disciplina e acompanhe cada dia da sua evolução.</p>
+
+            <ul class="showcase-perks">
+              <li>
+                <span class="perk-icon">⚡</span>
+                <div>
+                  <strong>Treinos sob medida</strong>
+                  <small>Cardio, força e mobilidade em um só lugar</small>
+                </div>
+              </li>
+              <li>
+                <span class="perk-icon">📅</span>
+                <div>
+                  <strong>Calendário de constância</strong>
+                  <small>Registre seus check-ins diários e metas</small>
+                </div>
+              </li>
+              <li>
+                <span class="perk-icon">🎯</span>
+                <div>
+                  <strong>Sincronização na nuvem</strong>
+                  <small>Seus dados salvos e seguros na sua conta</small>
+                </div>
+              </li>
+            </ul>
+
+            <div class="showcase-stats">
+              <div class="stat-pill">
+                <strong>12 dias</strong>
+                <span>Média de constância</span>
+              </div>
+              <div class="stat-pill">
+                <strong>+24</strong>
+                <span>Metas do mês</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- LADO DIREITO: FORMULÁRIOS DE ENTRAR E CADASTRAR -->
+        <div class="login-content">
+          <!-- ABAS DE NAVEGAÇÃO ENTRE LOGIN E CADASTRO -->
+          <div class="auth-tabs" role="tablist" aria-label="Opções de autenticação">
+            <button type="button" class="auth-tab active" id="tabLogin" role="tab" aria-selected="true" aria-controls="panelLogin">
+              Entrar
+            </button>
+            <button type="button" class="auth-tab" id="tabRegister" role="tab" aria-selected="false" aria-controls="panelRegister">
+              Criar conta
+            </button>
+          </div>
+
+          <!-- PAINEL DE LOGIN -->
+          <section class="auth-panel active" id="panelLogin" role="tabpanel" aria-labelledby="tabLogin">
+            <header class="auth-header">
+              <h2 id="authTitle">Bem-vindo de volta!</h2>
+              <p class="modal-copy">Entre com sua conta para acessar seus treinos e histórico.</p>
+            </header>
+
+            <button type="button" class="demo-login-chip" id="btnDemoLogin" title="Preenche as credenciais e entra automaticamente">
+              <span class="chip-spark">⚡</span>
+              <span>Entrar com conta demo <strong>(João Silva)</strong></span>
+            </button>
+
+            <form id="loginForm" novalidate autocomplete="on">
+              <div class="form-field" id="fieldLoginEmail">
+                <label for="loginEmail">E-mail</label>
+                <div class="input-wrap">
+                  <span class="input-icon" aria-hidden="true">✉</span>
+                  <input id="loginEmail" name="email" type="email" autocomplete="email" placeholder="seu@email.com" required />
+                </div>
+                <small class="field-error" id="emailError" aria-live="polite"></small>
+              </div>
+
+              <div class="form-field" id="fieldLoginPassword">
+                <div class="field-label-row">
+                  <label for="loginPassword">Senha</label>
+                  <a href="#" class="forgot-link" id="forgotPassword">Esqueci minha senha</a>
+                </div>
+                <div class="input-wrap">
+                  <span class="input-icon" aria-hidden="true">🔒</span>
+                  <input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Sua senha" required />
+                  <button class="password-toggle" type="button" id="togglePassword" aria-label="Mostrar ou ocultar senha" tabindex="-1">
+                    <span id="passwordEye" aria-hidden="true">👁️</span>
+                  </button>
+                </div>
+                <small class="field-error" id="passwordError" aria-live="polite"></small>
+              </div>
+
+              <div class="form-status" id="loginStatus" role="alert" aria-live="polite"></div>
+
+              <button class="primary-button full login-submit" type="submit" id="loginSubmit">
+                <span class="button-label">Entrar na plataforma</span>
+                <span class="button-spinner" aria-hidden="true"></span>
+                <span class="button-arrow">→</span>
+              </button>
+            </form>
+
+            <div class="divider"><span>ou continue com</span></div>
+            <button class="social-button" type="button" id="btnGoogleLogin">
+              <svg class="google-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.03h3.88c2.27-2.09 3.665-5.17 3.665-9.12z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.03c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.28v3.13C3.33 21.43 7.38 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.58H1.28C.46 8.2 0 10.04 0 12s.46 3.8 1.28 5.42l4-3.13z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.38 0 3.33 2.57 1.28 6.58l4 3.13c.95-2.83 3.6-4.96 6.72-4.96z"/>
+              </svg>
+              <span>Continuar com Google</span>
+            </button>
+
+            <p class="auth-switch">
+              Ainda não tem conta? <button type="button" class="switch-link" id="switchRegister">Cadastre-se grátis</button>
+            </p>
+          </section>
+
+          <!-- PAINEL DE CADASTRO -->
+          <section class="auth-panel" id="panelRegister" role="tabpanel" aria-labelledby="tabRegister">
+            <header class="auth-header">
+              <h2>Crie sua conta Fit.IA</h2>
+              <p class="modal-copy">Preencha seus dados para começar a treinar hoje mesmo.</p>
+            </header>
+
+            <form id="registerForm" novalidate autocomplete="on">
+              <div class="form-field" id="fieldRegisterName">
+                <label for="registerName">Nome completo</label>
+                <div class="input-wrap">
+                  <span class="input-icon" aria-hidden="true">👤</span>
+                  <input id="registerName" name="name" type="text" autocomplete="name" placeholder="Ex: Maria Silva" required />
+                </div>
+                <small class="field-error" id="registerNameError" aria-live="polite"></small>
+              </div>
+
+              <div class="form-field" id="fieldRegisterEmail">
+                <label for="registerEmail">E-mail</label>
+                <div class="input-wrap">
+                  <span class="input-icon" aria-hidden="true">✉</span>
+                  <input id="registerEmail" name="email" type="email" autocomplete="email" placeholder="seu@email.com" required />
+                </div>
+                <small class="field-error" id="registerEmailError" aria-live="polite"></small>
+              </div>
+
+              <div class="form-field" id="fieldRegisterPassword">
+                <div class="field-label-row">
+                  <label for="registerPassword">Senha</label>
+                  <span class="input-hint">Mínimo 6 caracteres</span>
+                </div>
+                <div class="input-wrap">
+                  <span class="input-icon" aria-hidden="true">🔒</span>
+                  <input id="registerPassword" name="password" type="password" autocomplete="new-password" placeholder="Crie uma senha forte" required />
+                  <button class="password-toggle" type="button" id="toggleRegisterPassword" aria-label="Mostrar ou ocultar senha" tabindex="-1">
+                    <span id="registerPasswordEye" aria-hidden="true">👁️</span>
+                  </button>
+                </div>
+                <small class="field-error" id="registerPasswordError" aria-live="polite"></small>
+              </div>
+
+              <div class="form-status" id="registerStatus" role="alert" aria-live="polite"></div>
+
+              <button class="primary-button full login-submit" type="submit" id="registerSubmit">
+                <span class="button-label">Finalizar cadastro</span>
+                <span class="button-spinner" aria-hidden="true"></span>
+                <span class="button-arrow">→</span>
+              </button>
+            </form>
+
+            <p class="auth-switch">
+              Já possui uma conta? <button type="button" class="switch-link" id="switchLogin">Entrar na minha conta</button>
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
     <div class="toast" id="toast">Treino marcado! Sua constância agradece. ✦</div>
     <script src="app.js"></script>
   </body>
