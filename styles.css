@@ -27,3 +27,36 @@
 .login-content form{width:100%}
 .login-modal>.close-modal{position:absolute;z-index:5}
 @media(max-width:800px){.login-modal{grid-template-columns:1fr;gap:0;padding:30px 20px;overflow:auto}.login-showcase{display:none}.login-content{width:min(100%,430px);padding:32px 26px}.login-modal:after{right:18px;top:18px;font-size:45px;letter-spacing:-3px}.close-modal{right:18px;top:16px}}
+
+/* Versão compacta do login: cartão central em vez de uma tela ocupando tudo. */
+.modal-backdrop{background:#24231f99;padding:24px}
+.login-modal{width:min(100%,980px);height:min(680px,calc(100vh - 48px));min-height:560px;border-radius:24px;padding:42px 64px;box-shadow:0 28px 80px #24231f45}
+.login-showcase{padding-left:1vw}
+.login-content{padding:34px 38px}
+@media(max-width:800px){.modal-backdrop{padding:14px}.login-modal{width:100%;height:auto;min-height:0;max-height:calc(100vh - 28px);padding:28px 16px;border-radius:20px}.login-content{padding:28px 24px}.login-modal:after{display:none}}
+
+/* Direção visual compacta inspirada na referência enviada. */
+.modal-backdrop{background:#ffffff;padding:0}
+.login-modal{width:min(100%,800px);height:540px;min-height:0;padding:0;border-radius:0;grid-template-columns:1fr 1fr;gap:0;overflow:hidden;box-shadow:0 18px 55px rgba(35,42,51,.18);background:#fff}
+.login-modal:before,.login-modal:after{display:none}
+.login-modal>.close-modal{color:#a3a3a3;right:14px;top:10px;font-size:21px;background:transparent}
+.login-showcase{height:100%;width:100%;max-width:none;padding:0;background:#c7d1db;display:grid;place-items:center;overflow:hidden;position:relative}
+.login-showcase strong{font:800 44px/1 Manrope;letter-spacing:-2px;color:#071019;z-index:2}
+.login-showcase strong span{color:#ff7620}
+.login-showcase .shape{display:block;position:absolute;width:235px;height:235px;border-radius:50%;background:#ff7620}
+.login-showcase .shape-top{left:-78px;top:-118px}
+.login-showcase .shape-bottom{right:-78px;bottom:-120px}
+.login-content{width:100%;height:100%;border:0;border-radius:0;box-shadow:none;padding:76px 48px 44px;display:flex;flex-direction:column;justify-content:center;background:#fff}
+.login-content .login-brand,.login-content .eyebrow,.login-content h2,.login-content .modal-copy{display:none}
+.login-content form{display:grid;gap:16px}
+.login-content label{font-size:0;color:transparent}
+.login-content label a{display:none}
+.login-content input{height:72px;margin:0;padding:0 29px;border:0;border-radius:40px;background:#ff934f;color:#0c1014;font:700 19px 'DM Sans';outline:0}
+.login-content input::placeholder{color:#0c1014;opacity:1}
+.login-content input:focus{box-shadow:0 0 0 4px #ff934f44}
+.login-content .primary-button{width:120px;align-self:center;margin-top:1px;background:#ff934f;box-shadow:none;border-radius:30px;padding:12px 16px;color:#111;font-size:12px}
+.login-content .primary-button span{display:none}
+.login-content .divider,.login-content .social-button{display:none}
+.login-content .signup{font-size:0;margin:10px 0 0;text-align:center}
+.login-content .signup a{display:inline-block;min-width:120px;padding:12px 20px;border-radius:30px;background:#ff934f;color:#111;font-size:12px;font-weight:600;text-decoration:none}
+@media(max-width:800px){.modal-backdrop{padding:0;background:#fff}.login-modal{width:100%;height:100vh;max-height:none;border-radius:0;grid-template-columns:1fr;grid-template-rows:190px 1fr}.login-showcase{height:190px}.login-showcase .shape{width:150px;height:150px}.login-showcase .shape-top{left:-46px;top:-85px}.login-showcase .shape-bottom{right:-46px;bottom:-85px}.login-showcase strong{font-size:36px}.login-content{height:auto;padding:44px 24px}.login-content input{height:62px;font-size:17px}}
