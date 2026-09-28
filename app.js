@@ -35,6 +35,7 @@ const routes = {
   inicio: 'Visão geral',
   treinos: 'Meus treinos',
   calendario: 'Calendário de constância',
+  'personal-ia': 'Personal IA & Consultoria',
   configuracoes: 'Configurações'
 };
 
@@ -533,6 +534,447 @@ function setupSettings() {
 }
 
 // ==========================================================================
+// MÓDULO PERSONAL IA (CHAT & RECOMENDAÇÕES)
+// ==========================================================================
+const chatHistory = [];
+
+function setupPersonalIaChat() {
+  const chatForm = document.getElementById('chatForm');
+  const chatInput = document.getElementById('chatInput');
+  const chatMessages = document.getElementById('chatMessages');
+  const btnClear = document.getElementById('btnClearChatHistory');
+  const suggestions = document.querySelectorAll('.suggestion-chip');
+
+  // Adiciona evento aos chips de sugestões
+  suggestions.forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (!chatInput) return;
+      chatInput.value = chip.textContent.trim();
+      chatForm?.requestSubmit();
+    });
+  });
+
+  // Limpa histórico
+  btnClear?.addEventListener('click', () => {
+    if (!chatMessages) return;
+    chatMessages.innerHTML = `
+      <div class="chat-msg coach">
+        <span class="msg-avatar">🤖</span>
+        <div class="msg-bubble">
+          Conversa reiniciada. Como posso ajudar com sua preparação física ou alimentação hoje?
+        </div>
+      </div>
+    `;
+    chatHistory.length = 0;
+    toast('Histórico da conversa limpo.');
+  });
+
+  // Envio de mensagem
+  chatForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = (chatInput?.value || '').trim();
+    if (!text) return;
+
+    // Adiciona mensagem do usuário
+    appendChatMessage('user', text);
+    chatInput.value = '';
+
+    // Adiciona indicador de digitação
+    const typingId = appendTypingIndicator();
+
+    try {
+      const res = await fetch('/api/ia/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: chatHistory })
+      });
+
+      removeTypingIndicator(typingId);
+
+      if (res.status === 401) {
+        appendChatMessage('coach', 'Por favor, realize seu login no Fit.IA para que eu possa sincronizar com suas métricas corporais!');
+        openAuthModal('login');
+        return;
+      }
+
+      const data = await res.json();
+      if (!res.ok) {
+        appendChatMessage('coach', data.error || 'Desculpe, tive uma instabilidade temporária ao processar sua resposta.');
+        return;
+      }
+
+      appendChatMessage('coach', data.response);
+      chatHistory.push({ role: 'user', content: text });
+      chatHistory.push({ role: 'assistant', content: data.response });
+    } catch (err) {
+      removeTypingIndicator(typingId);
+      appendChatMessage('coach', 'Erro de conexão com o servidor. Verifique se o backend do Fit.IA está em execução.');
+    }
+  });
+}
+
+function appendChatMessage(sender, text) {
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `chat-msg ${sender}`;
+
+  const avatar = document.createElement('span');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = sender === 'coach' ? '🤖' : (state.user?.name ? state.user.name[0].toUpperCase() : '👤');
+
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+
+  // Formatação simples de Markdown (negrito e quebras de linha)
+  const formatted = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br />');
+
+  bubble.innerHTML = formatted;
+
+  msgDiv.appendChild(avatar);
+  msgDiv.appendChild(bubble);
+  container.appendChild(msgDiv);
+  container.scrollTop = container.scrollHeight;
+}
+
+function appendTypingIndicator() {
+  const container = document.getElementById('chatMessages');
+  if (!container) return null;
+
+  const id = 'typing-' + Date.now();
+  const div = document.createElement('div');
+  div.className = 'chat-msg coach is-typing';
+  div.id = id;
+  div.innerHTML = `
+    <span class="msg-avatar">🤖</span>
+    <div class="msg-bubble typing-dots">
+      <span></span><span></span><span></span>
+    </div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return id;
+}
+
+function removeTypingIndicator(id) {
+  if (!id) return;
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// ==========================================================================
+// GERADORES DE TREINO E DIETA POR INTELIGÊNCIA ARTIFICIAL
+// ==========================================================================
+function setupIaGenerators() {
+  const btnWorkout = document.getElementById('btnIaGenerateWorkout');
+  const btnDiet = document.getElementById('btnIaGenerateDiet');
+
+  const planModal = document.getElementById('planModal');
+  const dietModal = document.getElementById('dietModal');
+  const closePlan = document.getElementById('closePlanModal');
+  const closeDiet = document.getElementById('closeDietModal');
+
+  closePlan?.addEventListener('click', () => planModal?.classList.remove('open'));
+  closeDiet?.addEventListener('click', () => dietModal?.classList.remove('open'));
+
+  planModal?.addEventListener('click', e => {
+    if (e.target === planModal) planModal.classList.remove('open');
+  });
+
+  dietModal?.addEventListener('click', e => {
+    if (e.target === dietModal) dietModal.classList.remove('open');
+  });
+
+  // Botão: Gerar Treino Personalizado
+  btnWorkout?.addEventListener('click', async () => {
+    if (!state.user) {
+      toast('Faça login para gerar e salvar seu treino com IA!');
+      openAuthModal('login');
+      return;
+    }
+
+    btnWorkout.classList.add('loading');
+    toast('Consultando Personal IA para estruturar sua periodização...');
+
+    try {
+      const res = await fetch('/api/ia/gerar-treino', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        toast(err.error || 'Erro ao gerar treino.');
+        return;
+      }
+
+      const plan = await res.json();
+      renderIaWorkoutPlan(plan);
+      planModal?.classList.add('open');
+    } catch (err) {
+      toast('Erro de rede ao conectar à IA de Treinos.');
+    } finally {
+      btnWorkout.classList.remove('loading');
+    }
+  });
+
+  // Botão: Gerar Dieta & Macros
+  btnDiet?.addEventListener('click', async () => {
+    if (!state.user) {
+      toast('Faça login para calcular sua dieta personalizada!');
+      openAuthModal('login');
+      return;
+    }
+
+    btnDiet.classList.add('loading');
+    toast('Calculando TMB, TDEE e proporção de macronutrientes...');
+
+    try {
+      const res = await fetch('/api/ia/gerar-dieta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        toast(err.error || 'Erro ao calcular dieta.');
+        return;
+      }
+
+      const diet = await res.json();
+      renderIaDietPlan(diet);
+      dietModal?.classList.add('open');
+    } catch (err) {
+      toast('Erro de rede ao conectar à IA Nutricional.');
+    } finally {
+      btnDiet.classList.remove('loading');
+    }
+  });
+
+  document.getElementById('btnSavePlanToStorage')?.addEventListener('click', () => {
+    planModal?.classList.remove('open');
+    toast('Plano de treino salvo na sua conta com sucesso! ✦');
+    go('treinos');
+  });
+
+  document.getElementById('btnSaveDietToStorage')?.addEventListener('click', () => {
+    dietModal?.classList.remove('open');
+    toast('Plano nutricional adotado! Acompanhe seus macros diários.');
+  });
+}
+
+function renderIaWorkoutPlan(plan) {
+  const titleEl = document.getElementById('planModalTitle');
+  const subEl = document.getElementById('planModalSub');
+  const bodyEl = document.getElementById('planModalContent');
+
+  if (titleEl) titleEl.textContent = plan.titulo || 'Treino Personalizado Fit.IA';
+  if (subEl) subEl.textContent = `Frequência recomendada: ${plan.frequenciaSemanal || '4-5x na semana'} · Nível: ${plan.nivel || 'Intermediário'}`;
+
+  if (!bodyEl) return;
+
+  let html = `
+    <div class="ia-plan-split-overview">
+      <strong>Divisão da Rotina:</strong>
+      <ul>${(plan.divisao || []).map(d => `<li>${d}</li>`).join('')}</ul>
+    </div>
+  `;
+
+  if (Array.isArray(plan.rotina)) {
+    plan.rotina.forEach(sessao => {
+      html += `
+        <div class="ia-routine-card">
+          <div class="ia-routine-head">
+            <h3>${sessao.dia}</h3>
+            <span>Foco: ${sessao.foco}</span>
+          </div>
+          <table class="ia-exercises-table">
+            <thead>
+              <tr>
+                <th>Exercício</th>
+                <th>Séries</th>
+                <th>Repetições</th>
+                <th>Descanso</th>
+                <th>Observações</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${(sessao.exercicios || []).map(ex => `
+                <tr>
+                  <td><strong>${ex.nome}</strong></td>
+                  <td>${ex.series}</td>
+                  <td>${ex.repeticoes}</td>
+                  <td>${ex.descanso}</td>
+                  <td><small>${ex.obs || 'Forma controlada'}</small></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    });
+  }
+
+  bodyEl.innerHTML = html;
+}
+
+function renderIaDietPlan(diet) {
+  const titleEl = document.getElementById('dietModalTitle');
+  const subEl = document.getElementById('dietModalSub');
+  const bodyEl = document.getElementById('dietModalContent');
+
+  if (titleEl) titleEl.textContent = diet.titulo || 'Plano Nutricional Inteligente';
+  if (subEl) subEl.textContent = `Hidratação recomendada: ${diet.hidratacao || '3L/dia'}`;
+
+  if (!bodyEl) return;
+
+  const meta = diet.dadosMetabolicos || {};
+  const macros = diet.macronutrientes || {};
+
+  let html = `
+    <div class="diet-metrics-grid">
+      <div class="diet-metric-card">
+        <span class="diet-label">Taxa Metabólica Basal (TMB)</span>
+        <strong>${meta.tmb || '—'}</strong>
+      </div>
+      <div class="diet-metric-card">
+        <span class="diet-label">Gasto Calórico Total (TDEE)</span>
+        <strong>${meta.gastoTotalDiario || '—'}</strong>
+      </div>
+      <div class="diet-metric-card highlight">
+        <span class="diet-label">Meta Calórica Diária</span>
+        <strong>${meta.metaCaloricaDiaria || '—'}</strong>
+      </div>
+    </div>
+
+    <div class="diet-macros-row">
+      <div class="macro-badge protein">
+        <span>Proteínas</span>
+        <strong>${macros.proteinas || '—'}</strong>
+      </div>
+      <div class="macro-badge carb">
+        <span>Carboidratos</span>
+        <strong>${macros.carboidratos || '—'}</strong>
+      </div>
+      <div class="macro-badge fat">
+        <span>Gorduras Boas</span>
+        <strong>${macros.gorduras || '—'}</strong>
+      </div>
+    </div>
+
+    <h3 style="margin: 24px 0 12px; font-size: 1.1rem; color: var(--text-heading);">Cronograma de Refeições Sugerido:</h3>
+    <div class="diet-meals-list">
+  `;
+
+  if (Array.isArray(diet.refeicoes)) {
+    diet.refeicoes.forEach(m => {
+      html += `
+        <div class="diet-meal-item">
+          <div class="diet-meal-head">
+            <strong>${m.refeicao}</strong>
+            <span>${m.horario} · ${m.caloriasAprox || ''}</span>
+          </div>
+          <ul>
+            ${(m.itens || []).map(i => `<li>${i}</li>`).join('')}
+          </ul>
+        </div>
+      `;
+    });
+  }
+
+  html += `</div>`;
+  bodyEl.innerHTML = html;
+}
+
+// ==========================================================================
+// FORMULÁRIO DE PERFIL BIOMÉTRICO (CONFIGURAÇÕES)
+// ==========================================================================
+function setupProfileForm() {
+  const profileForm = document.getElementById('profileForm');
+  const btnSave = document.getElementById('btnSaveProfile');
+
+  profileForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!state.user) {
+      toast('Faça login para salvar seus dados corporais!');
+      openAuthModal('login');
+      return;
+    }
+
+    const payload = {
+      idade: Number(document.getElementById('profAge')?.value || 25),
+      peso: Number(document.getElementById('profWeight')?.value || 70),
+      altura: Number(document.getElementById('profHeight')?.value || 1.75),
+      sexo: document.getElementById('profGender')?.value || 'Masculino',
+      nivelAtividade: document.getElementById('profActivity')?.value || 'Moderado',
+      objetivo: document.getElementById('profGoal')?.value || 'Hipertrofia e Ganho de Massa',
+      restricoesAlimentares: document.getElementById('profRestrictions')?.value || 'Nenhuma'
+    };
+
+    if (btnSave) {
+      btnSave.disabled = true;
+      btnSave.textContent = 'Salvando biometria...';
+    }
+
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        toast(data.error || 'Erro ao atualizar perfil.');
+        return;
+      }
+
+      toast('Perfil biométrico atualizado com sucesso! ✦');
+    } catch (err) {
+      toast('Erro de conexão ao salvar perfil.');
+    } finally {
+      if (btnSave) {
+        btnSave.disabled = false;
+        btnSave.innerHTML = '<span>💾</span> Salvar Perfil Biométrico';
+      }
+    }
+  });
+}
+
+async function loadUserProfile() {
+  if (!state.user) return;
+  try {
+    const res = await fetch('/api/user/profile');
+    if (!res.ok) return;
+
+    const prof = await res.json();
+    if (!prof) return;
+
+    const age = document.getElementById('profAge');
+    const weight = document.getElementById('profWeight');
+    const height = document.getElementById('profHeight');
+    const gender = document.getElementById('profGender');
+    const activity = document.getElementById('profActivity');
+    const goal = document.getElementById('profGoal');
+    const restrictions = document.getElementById('profRestrictions');
+
+    if (age && prof.idade) age.value = prof.idade;
+    if (weight && prof.peso) weight.value = prof.peso;
+    if (height && prof.altura) height.value = prof.altura;
+    if (gender && prof.sexo) gender.value = prof.sexo;
+    if (activity && prof.nivelAtividade) activity.value = prof.nivelAtividade;
+    if (goal && prof.objetivo) goal.value = prof.objetivo;
+    if (restrictions && prof.restricoesAlimentares) restrictions.value = prof.restricoesAlimentares;
+  } catch (err) {
+    console.info('Perfil não pôde ser carregado:', err);
+  }
+}
+
+// ==========================================================================
 // MÓDULO DE AUTENTICAÇÃO (LOGIN / REGISTRO)
 // ==========================================================================
 const loginModal = document.getElementById('loginModal');
@@ -645,6 +1087,7 @@ async function checkAuthSession() {
             renderCalendars();
           }
         }
+        loadUserProfile();
       }
     }
   } catch (err) {
@@ -717,6 +1160,7 @@ async function handleLoginSubmit(e) {
         renderCalendars();
       }
     }
+    loadUserProfile();
   } catch (error) {
     statusEl.textContent = 'Erro ao conectar ao servidor.';
     statusEl.className = 'form-status error';
@@ -969,6 +1413,9 @@ function initApp() {
   setupProModal();
   setupNotifications();
   setupSettings();
+  setupPersonalIaChat();
+  setupIaGenerators();
+  setupProfileForm();
 
   // Render inicial
   renderCalendars();

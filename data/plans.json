@@ -1,0 +1,211 @@
+{
+  "ab3bdca7-be53-470b-bc07-3597613c3074": [
+    {
+      "tipo": "dieta",
+      "plano": {
+        "id": "395d757f-cbc3-4538-a478-58cf20227fb9",
+        "titulo": "Plano Nutricional Inteligente — Definição & Hipertrofia",
+        "dadosMetabolicos": {
+          "tmb": "1763 kcal",
+          "gastoTotalDiario": "2556 kcal",
+          "metaCaloricaDiaria": "2906 kcal"
+        },
+        "macronutrientes": {
+          "proteinas": "157g (22%)",
+          "carboidratos": "410g (56%)",
+          "gorduras": "71g (22%)"
+        },
+        "hidratacao": "3.1 Litros de água/dia",
+        "refeicoes": [
+          {
+            "refeicao": "Café da Manhã (Desjejum)",
+            "horario": "07:30",
+            "caloriasAprox": "639 kcal",
+            "itens": [
+              "3 ovos inteiros mexidos com um fio de azeite",
+              "2 fatias de pão 100% integral",
+              "1 banana média com 20g de aveia em flocos",
+              "Café preto puro ou chá sem açúcar"
+            ]
+          },
+          {
+            "refeicao": "Almoço (Refeição Principal)",
+            "horario": "12:30",
+            "caloriasAprox": "1017 kcal",
+            "itens": [
+              "160g de peito de frango grelhado ou filé de tilápia",
+              "180g de arroz integral ou batata doce cozida",
+              "1 concha rasa de feijão (100g)",
+              "Prato farto de salada verde (alface, rúcula, tomate, pepino)",
+              "1 colher de sopa de azeite de oliva extravirgem"
+            ]
+          },
+          {
+            "refeicao": "Lanche da Tarde (Pré-Treino)",
+            "horario": "16:00",
+            "caloriasAprox": "523 kcal",
+            "itens": [
+              "1 pote de iogurte natural desnatado (160g)",
+              "30g de Whey Protein concentrado ou isolado",
+              "1 maçã picada ou 100g de morangos"
+            ]
+          },
+          {
+            "refeicao": "Jantar (Pós-Treino & Recuperação)",
+            "horario": "20:00",
+            "caloriasAprox": "727 kcal",
+            "itens": [
+              "150g de carne magra moída (patinho) ou filé de frango",
+              "160g de mandioca ou batata inglesa assada",
+              "Legumes grelhados (brócolis, cenoura, abobrinha à vontade)"
+            ]
+          }
+        ],
+        "dataCriacao": "2026-09-28T19:21:27.665Z"
+      },
+      "dataCriacao": "2026-09-28T19:21:27.665Z"
+    },
+    {
+      "tipo": "treino",
+      "plano": {
+        "id": "6c972b76-cfbd-4522-99b8-6cca51dd1dc3",
+        "titulo": "Plano Fit.IA Personalizado — Definição & Hipertrofia",
+        "frequenciaSemanal": "4 a 5 sessões semanais",
+        "nivel": "Moderado",
+        "divisao": [
+          "Treino A - Peitoral, Ombros e Tríceps (Push)",
+          "Treino B - Dorsais, Deltoide Posterior e Bíceps (Pull)",
+          "Treino C - Quadríceps, Posteriores e Panturrilha (Legs)",
+          "Treino D - Abdômen, Core & Mobilidade"
+        ],
+        "rotina": [
+          {
+            "dia": "Treino A (Push)",
+            "foco": "Peito, Deltoide e Tríceps",
+            "exercicios": [
+              {
+                "nome": "Supino Reto com Halteres",
+                "series": 4,
+                "repeticoes": "8-10",
+                "descanso": "90s",
+                "obs": "Controle de 3s na descida excêntrica"
+              },
+              {
+                "nome": "Supino Inclinado com Halteres (30°)",
+                "series": 3,
+                "repeticoes": "10-12",
+                "descanso": "60s",
+                "obs": "Foco no feixe clavicular do peitoral"
+              },
+              {
+                "nome": "Desenvolvimento Militar com Halteres",
+                "series": 3,
+                "repeticoes": "10",
+                "descanso": "60s",
+                "obs": "Manter abdômen firme e coluna estável"
+              },
+              {
+                "nome": "Elevação Lateral na Polia ou Halter",
+                "series": 4,
+                "repeticoes": "12-15",
+                "descanso": "45s",
+                "obs": "Movimento controlado sem impulso"
+              },
+              {
+                "nome": "Tríceps Corda na Polia",
+                "series": 3,
+                "repeticoes": "12-15",
+                "descanso": "45s",
+                "obs": "Pico de contração de 1s embaixo"
+              }
+            ]
+          },
+          {
+            "dia": "Treino B (Pull)",
+            "foco": "Costas e Bíceps",
+            "exercicios": [
+              {
+                "nome": "Puxada Frontal Aberta",
+                "series": 4,
+                "repeticoes": "10-12",
+                "descanso": "75s",
+                "obs": "Puxar com os cotovelos apontando para o chão"
+              },
+              {
+                "nome": "Remada Curvada com Barra ou Halter",
+                "series": 4,
+                "repeticoes": "8-10",
+                "descanso": "90s",
+                "obs": "Coluna neutra, cotovelos junto ao corpo"
+              },
+              {
+                "nome": "Crucifixo Invertido com Halteres",
+                "series": 3,
+                "repeticoes": "15",
+                "descanso": "45s",
+                "obs": "Foco na porção posterior do ombro"
+              },
+              {
+                "nome": "Rosca Direta com Barra W",
+                "series": 3,
+                "repeticoes": "10-12",
+                "descanso": "60s",
+                "obs": "Não balançar o tronco"
+              },
+              {
+                "nome": "Rosca Martelo com Halteres",
+                "series": 3,
+                "repeticoes": "12",
+                "descanso": "45s",
+                "obs": "Excelente para braquial e antebraço"
+              }
+            ]
+          },
+          {
+            "dia": "Treino C (Legs)",
+            "foco": "Pernas Completas",
+            "exercicios": [
+              {
+                "nome": "Agachamento Livre com Barra",
+                "series": 4,
+                "repeticoes": "8-10",
+                "descanso": "90s",
+                "obs": "Mobilidade de quadril ativa"
+              },
+              {
+                "nome": "Leg Press 45°",
+                "series": 4,
+                "repeticoes": "10-12",
+                "descanso": "75s",
+                "obs": "Não travar joelhos na extensão máxima"
+              },
+              {
+                "nome": "Mesa Flexora ou Stiff",
+                "series": 3,
+                "repeticoes": "10-12",
+                "descanso": "60s",
+                "obs": "Foco no posterior de coxa"
+              },
+              {
+                "nome": "Elevação Pélvica",
+                "series": 3,
+                "repeticoes": "12-15",
+                "descanso": "60s",
+                "obs": "Aperto forte no glúteo no topo"
+              },
+              {
+                "nome": "Panturrilha em Pé na Máquina",
+                "series": 4,
+                "repeticoes": "15-20",
+                "descanso": "45s",
+                "obs": "Amplitude máxima com pausa embaixo"
+              }
+            ]
+          }
+        ],
+        "dataCriacao": "2026-09-28T19:21:27.656Z"
+      },
+      "dataCriacao": "2026-09-28T19:21:27.657Z"
+    }
+  ]
+}

@@ -44,6 +44,14 @@
             </span>
             <span>Calendário de constância</span>
           </a>
+
+          <a class="nav-link" href="#personal-ia" data-route="personal-ia">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><rect width="18" height="12" x="3" y="8" rx="2"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+            </span>
+            <span>Personal IA</span>
+            <span class="badge-spark-nav">IA</span>
+          </a>
         </nav>
 
         <div class="sidebar-spacer"></div>
@@ -384,58 +392,208 @@
         </section>
 
         <!-- ==========================================
-             VIEW 4: CONFIGURAÇÕES
+             VIEW 4: PERSONAL IA & CONSULTORIA ESPORTIVA
+             ========================================== -->
+        <section class="view" id="view-personal-ia">
+          <div class="page-title">
+            <p class="eyebrow">CONSULTORIA &amp; INTELIGÊNCIA ARTIFICIAL</p>
+            <h1>Personal Trainer &amp; Nutricionista IA.</h1>
+            <p class="subheading">Tire dúvidas sobre postura, cargas, substituição de exercícios e gere rotinas sob medida.</p>
+          </div>
+
+          <!-- AÇÕES RÁPIDAS DE IA -->
+          <div class="ia-actions-bar">
+            <button class="ia-action-chip" id="btnIaGenerateWorkout">
+              <span class="chip-icon">⚡</span>
+              <div>
+                <strong>Gerar Treino Personalizado</strong>
+                <small>Divisão A/B/C/D com base no seu perfil</small>
+              </div>
+            </button>
+
+            <button class="ia-action-chip" id="btnIaGenerateDiet">
+              <span class="chip-icon">🥗</span>
+              <div>
+                <strong>Gerar Dieta &amp; Macronutrientes</strong>
+                <small>Cálculo exato de calorias e refeições</small>
+              </div>
+            </button>
+          </div>
+
+          <!-- CONTAINER DO CHAT EM TEMPO REAL -->
+          <div class="panel chat-panel">
+            <div class="chat-header">
+              <div class="chat-coach-info">
+                <span class="coach-avatar">🤖</span>
+                <div>
+                  <strong>Fit.IA Coach</strong>
+                  <small><span class="online-indicator"></span> Especialista em Biomecânica &amp; Nutrição</small>
+                </div>
+              </div>
+              <button class="text-button" id="btnClearChatHistory">Limpar conversa</button>
+            </div>
+
+            <!-- HISTÓRICO DE MENSAGENS -->
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-msg coach">
+                <span class="msg-avatar">🤖</span>
+                <div class="msg-bubble">
+                  Olá! Sou seu Personal Trainer e Nutricionista IA do Fit.IA.
+                  Posso analisar sua técnica, sugerir substituições de exercícios, ajustar sua ingestão de proteínas e estruturar sua rotina de acordo com seu objetivo.
+                  <br /><br />
+                  Como posso potencializar seus treinos hoje?
+                </div>
+              </div>
+            </div>
+
+            <!-- CHIPS DE SUGESTÃO DE PERGUNTAS -->
+            <div class="chat-suggestions" id="chatSuggestions">
+              <button class="suggestion-chip">Como melhorar meu agachamento?</button>
+              <button class="suggestion-chip">O que comer no pré e pós-treino?</button>
+              <button class="suggestion-chip">Substituição para supino com barra</button>
+              <button class="suggestion-chip">Quantos gramas de proteína devo consumir?</button>
+            </div>
+
+            <!-- FORMULÁRIO DE ENVIO DE MENSAGEM -->
+            <form class="chat-input-bar" id="chatForm">
+              <input type="text" id="chatInput" placeholder="Faça uma pergunta sobre treinos, cargas ou nutrição..." autocomplete="off" required />
+              <button type="submit" class="primary-button" id="btnSendChat" aria-label="Enviar mensagem">
+                <span>Enviar</span> <span>↗</span>
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 5: CONFIGURAÇÕES & PERFIL BIOMÉTRICO
              ========================================== -->
         <section class="view" id="view-configuracoes">
           <div class="page-title">
-            <p class="eyebrow">PERSONALIZAÇÃO</p>
-            <h1>Configurações da sua conta.</h1>
-            <p class="subheading">Ajuste lembretes, metas e preferências do Fit.IA.</p>
+            <p class="eyebrow">DADOS PESSOAIS &amp; PREFERÊNCIAS</p>
+            <h1>Configurações &amp; Perfil Biométrico.</h1>
+            <p class="subheading">Mantenha seus dados físicos atualizados para que a IA gere treinos e dietas precisos.</p>
           </div>
 
-          <div class="panel settings-panel">
-            <div class="setting-row">
-              <div>
-                <strong>Lembretes diários de treino</strong>
-                <p>Receba um aviso inteligente 1 hora antes do seu horário habitual.</p>
+          <div class="settings-grid-layout">
+            <!-- CARTÃO 1: PERFIL BIOMÉTRICO -->
+            <div class="panel settings-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">BIOMETRIA DO ALUNO</p>
+                  <h2>Perfil Físico &amp; Metas</h2>
+                </div>
               </div>
-              <button class="toggle on" id="toggleReminders" aria-label="Alternar lembretes"><i></i></button>
+
+              <form id="profileForm" class="profile-form-grid">
+                <div class="form-field">
+                  <label for="profAge">Idade (anos)</label>
+                  <input type="number" id="profAge" min="12" max="100" placeholder="Ex: 28" value="28" required />
+                </div>
+
+                <div class="form-field">
+                  <label for="profWeight">Peso atual (kg)</label>
+                  <input type="number" step="0.1" id="profWeight" min="30" max="300" placeholder="Ex: 76.5" value="76.5" required />
+                </div>
+
+                <div class="form-field">
+                  <label for="profHeight">Altura (m)</label>
+                  <input type="number" step="0.01" id="profHeight" min="1.00" max="2.50" placeholder="Ex: 1.78" value="1.78" required />
+                </div>
+
+                <div class="form-field">
+                  <label for="profGender">Sexo biológico</label>
+                  <select id="profGender" class="settings-select">
+                    <option value="Masculino" selected>Masculino</option>
+                    <option value="Feminino">Feminino</option>
+                    <option value="Outro">Outro</option>
+                  </select>
+                </div>
+
+                <div class="form-field full-col">
+                  <label for="profActivity">Nível de atividade física</label>
+                  <select id="profActivity" class="settings-select">
+                    <option value="Sedentário">Sedentário (pouco ou nenhum exercício)</option>
+                    <option value="Leve">Leve (treinos leves 1 a 3 dias/semana)</option>
+                    <option value="Moderado" selected>Moderado (treinos moderados 3 a 5 dias/semana)</option>
+                    <option value="Intenso">Intenso (treinos pesados 6 a 7 dias/semana)</option>
+                  </select>
+                </div>
+
+                <div class="form-field full-col">
+                  <label for="profGoal">Objetivo fitness principal</label>
+                  <select id="profGoal" class="settings-select">
+                    <option value="Hipertrofia e Ganho de Massa" selected>Hipertrofia &amp; Ganho de Massa Muscular</option>
+                    <option value="Emagrecimento e Queima de Gordura">Emagrecimento &amp; Definição Muscular</option>
+                    <option value="Condicionamento e Saúde">Condicionamento Físico &amp; Longevidade</option>
+                    <option value="Força Pura">Ganho de Força Bruta</option>
+                  </select>
+                </div>
+
+                <div class="form-field full-col">
+                  <label for="profRestrictions">Restrições alimentares, dores ou lesões</label>
+                  <input type="text" id="profRestrictions" placeholder="Ex: Intolerância a lactose, dor leve no ombro esquerdo..." value="Nenhuma restrição" />
+                </div>
+
+                <div class="setting-actions full-col">
+                  <button type="submit" class="primary-button" id="btnSaveProfile">
+                    <span>💾</span> Salvar Perfil Biométrico
+                  </button>
+                </div>
+              </form>
             </div>
 
-            <div class="setting-row">
-              <div>
-                <strong>Resumo semanal de constância</strong>
-                <p>Receba um balanço do seu gasto calórico e frequência todo domingo.</p>
+            <!-- CARTÃO 2: PREFERÊNCIAS DE APLICATIVO -->
+            <div class="panel settings-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">SISTEMA</p>
+                  <h2>Preferências de Uso</h2>
+                </div>
               </div>
-              <button class="toggle on" id="toggleWeeklyReport" aria-label="Alternar resumo semanal"><i></i></button>
-            </div>
 
-            <div class="setting-row">
-              <div>
-                <strong>Meta de treinos mensal</strong>
-                <p>Escolha a quantidade de treinos para o cálculo da sua barra de progresso.</p>
+              <div class="setting-row">
+                <div>
+                  <strong>Lembretes diários de treino</strong>
+                  <p>Receba um aviso inteligente 1 hora antes do seu treino.</p>
+                </div>
+                <button class="toggle on" id="toggleReminders" aria-label="Alternar lembretes"><i></i></button>
               </div>
-              <select class="settings-select" id="settingMonthlyGoal">
-                <option value="16">16 treinos (4x / semana)</option>
-                <option value="20">20 treinos (5x / semana)</option>
-                <option value="24" selected>24 treinos (6x / semana - Padrão)</option>
-                <option value="28">28 treinos (Atleta dedicado)</option>
-              </select>
-            </div>
 
-            <div class="setting-row">
-              <div>
-                <strong>Unidade de medida</strong>
-                <p>Formato de peso e cargas na plataforma.</p>
+              <div class="setting-row">
+                <div>
+                  <strong>Resumo semanal de constância</strong>
+                  <p>Receba um balanço do seu gasto calórico todo domingo.</p>
+                </div>
+                <button class="toggle on" id="toggleWeeklyReport" aria-label="Alternar resumo"><i></i></button>
               </div>
-              <select class="settings-select" id="settingUnit">
-                <option value="kg" selected>Quilogramas (kg)</option>
-                <option value="lbs">Libras (lbs)</option>
-              </select>
-            </div>
 
-            <div class="setting-actions">
-              <button class="primary-button" id="btnSaveSettings">Salvar preferências</button>
+              <div class="setting-row">
+                <div>
+                  <strong>Meta de treinos mensal</strong>
+                  <p>Meta para cálculo da barra de progresso.</p>
+                </div>
+                <select class="settings-select" id="settingMonthlyGoal">
+                  <option value="16">16 treinos (4x / semana)</option>
+                  <option value="20">20 treinos (5x / semana)</option>
+                  <option value="24" selected>24 treinos (6x / semana)</option>
+                  <option value="28">28 treinos (Atleta dedicado)</option>
+                </select>
+              </div>
+
+              <div class="setting-row">
+                <div>
+                  <strong>Unidade de medida</strong>
+                  <p>Formato de cargas e balança.</p>
+                </div>
+                <select class="settings-select" id="settingUnit">
+                  <option value="kg" selected>Quilogramas (kg)</option>
+                  <option value="lbs">Libras (lbs)</option>
+                </select>
+              </div>
+
+              <div class="setting-actions">
+                <button class="outline-button" id="btnSaveSettings">Salvar preferências</button>
+              </div>
             </div>
           </div>
         </section>
@@ -714,6 +872,50 @@
         </div>
 
         <button class="primary-button full" id="btnTryPro">Experimentar 7 dias grátis <span>→</span></button>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL DE PLANO DE TREINO GERADO POR IA
+         ========================================== -->
+    <div class="modal-backdrop" id="planModal" role="dialog" aria-modal="true">
+      <div class="ia-result-modal">
+        <button class="close-modal" id="closePlanModal" aria-label="Fechar">×</button>
+        <div class="ia-modal-header">
+          <span class="badge-spark">✦ INTELIGÊNCIA ARTIFICIAL FIT.IA</span>
+          <h2 id="planModalTitle">Plano de Treino Personalizado</h2>
+          <p id="planModalSub">Gerado com base no seu objetivo e nível atlético.</p>
+        </div>
+        <div class="ia-result-body" id="planModalContent">
+          <!-- Conteúdo gerado dinamicamente -->
+        </div>
+        <div class="ia-modal-footer">
+          <button class="primary-button full" id="btnSavePlanToStorage">
+            <span>💾</span> Salvar na Minha Biblioteca
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL DE PLANO NUTRICIONAL GERADO POR IA
+         ========================================== -->
+    <div class="modal-backdrop" id="dietModal" role="dialog" aria-modal="true">
+      <div class="ia-result-modal">
+        <button class="close-modal" id="closeDietModal" aria-label="Fechar">×</button>
+        <div class="ia-modal-header">
+          <span class="badge-spark">✦ NUTRIÇÃO &amp; METABOLISMO FIT.IA</span>
+          <h2 id="dietModalTitle">Plano Nutricional &amp; Macronutrientes</h2>
+          <p id="dietModalSub">Cálculo de TMB, meta calórica e distribuição de macros.</p>
+        </div>
+        <div class="ia-result-body" id="dietModalContent">
+          <!-- Conteúdo gerado dinamicamente -->
+        </div>
+        <div class="ia-modal-footer">
+          <button class="primary-button full" id="btnSaveDietToStorage">
+            <span>✓</span> Adotar Plano de Alimentação
+          </button>
+        </div>
       </div>
     </div>
 
