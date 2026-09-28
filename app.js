@@ -1,14 +1,29 @@
 /**
- * Fit.IA - Aplicação Frontend
- * Autenticação, navegação, calendário de constância e sincronização de dados.
+ * Fit.IA - Aplicação Frontend Inteligente
+ * Autenticação, navegação por rotas, biblioteca dinâmica de treinos,
+ * cronômetro de sessão, calendário de constância e sincronização com backend.
  */
 
-// Estado global da aplicação
+// ==========================================================================
+// ESTADO GLOBAL DA APLICAÇÃO
+// ==========================================================================
 const state = {
   user: null,
   trained: JSON.parse(localStorage.getItem('fitia-trained') || '[]'),
   month: 8, // Setembro (0-indexed)
-  year: 2026
+  year: 2026,
+  todayStr: '2026-09-28', // Data base da simulação
+  workouts: [],
+  currentWorkoutSession: null,
+  timerSeconds: 0,
+  timerInterval: null,
+  timerRunning: false,
+  settings: {
+    reminders: JSON.parse(localStorage.getItem('fitia-reminders') ?? 'true'),
+    weeklyReport: JSON.parse(localStorage.getItem('fitia-weekly-report') ?? 'true'),
+    monthlyGoal: Number(localStorage.getItem('fitia-monthly-goal') || 24),
+    unit: localStorage.getItem('fitia-unit') || 'kg'
+  }
 };
 
 const monthNames = [
@@ -19,7 +34,7 @@ const monthNames = [
 const routes = {
   inicio: 'Visão geral',
   treinos: 'Meus treinos',
-  calendario: 'Calendário',
+  calendario: 'Calendário de constância',
   configuracoes: 'Configurações'
 };
 
@@ -33,10 +48,12 @@ function toast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3200);
 }
 
-// Navegação entre Telas
+// ==========================================================================
+// ROTEAMENTO E NAVEGAÇÃO
+// ==========================================================================
 function go(route) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
   const targetView = document.querySelector(`#view-${route}`);
@@ -50,10 +67,45 @@ function go(route) {
   if (pageNameEl) pageNameEl.textContent = routes[route] || 'Visão geral';
 
   document.querySelector('.sidebar')?.classList.remove('open');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Renderização do Calendário de Treinos
-function renderCalendar(targetId, isFull = false) {
+// ==========================================================================
+// CÁLCULO DE SEQUÊNCIA (STREAK)
+// ==========================================================================
+function calculateStreak() {
+  if (!state.trained.length) return 0;
+  const sorted = [...state.trained].sort().reverse();
+  let streak = 0;
+  let cursor = new Date(2026, 8, 28); // 28/09/2026
+
+  for (let i = 0; i < 60; i++) {
+    const k = `${cursor.getFullYear()}-${pad(cursor.getMonth() + 1)}-${pad(cursor.getDate())}`;
+    if (state.trained.includes(k)) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    } else {
+      if (i === 0) {
+        // Se não treinou hoje, checa a partir de ontem
+        cursor.setDate(cursor.getDate() - 1);
+        continue;
+      }
+      break;
+    }
+  }
+  return streak;
+}
+
+// ==========================================================================
+// RENDERIZAÇÃO DO CALENDÁRIO
+// ==========================================================================
+function renderCalendars() {
+  renderCalendarGrid('miniCalendar', false);
+  renderCalendarGrid('fullCalendar', true);
+  updateCalendarSummaries();
+}
+
+function renderCalendarGrid(targetId, isFull = false) {
   const el = document.getElementById(targetId);
   if (!el) return;
   el.innerHTML = '';
@@ -63,12 +115,12 @@ function renderCalendar(targetId, isFull = false) {
   const totalDays = new Date(state.year, state.month + 1, 0).getDate();
   const prevMonthDays = new Date(state.year, state.month, 0).getDate();
 
-  // Dias do mês anterior
+  // Dias do mês anterior (padding visual)
   for (let i = 0; i < startDay; i++) {
     const s = document.createElement('span');
     s.className = 'empty';
     s.textContent = prevMonthDays - startDay + i + 1;
-    s.style.opacity = '0.25';
+    s.style.opacity = '0.28';
     el.appendChild(s);
   }
 
@@ -81,88 +133,425 @@ function renderCalendar(targetId, isFull = false) {
     if (state.trained.includes(dateKey)) {
       s.classList.add('done');
     }
-    if (dateKey === '2026-09-28') {
+    if (dateKey === state.todayStr) {
       s.classList.add('today');
     }
 
-    if (isFull) {
-      s.addEventListener('click', async () => {
-        const isTrained = state.trained.includes(dateKey);
-        const willBeTrained = !isTrained;
-
-        if (willBeTrained) {
-          state.trained = [...new Set([...state.trained, dateKey])];
-        } else {
-          state.trained = state.trained.filter(x => x !== dateKey);
-        }
-
-        localStorage.setItem('fitia-trained', JSON.stringify(state.trained));
-        renderCalendar('fullCalendar', true);
-        renderCalendar('miniCalendar');
-        updateCalendarSummary();
-
-        toast(willBeTrained ? 'Treino marcado! Sua constância agradece. ✦' : 'Treino desmarcado.');
-
-        // Sincroniza com backend se estiver logado
-        if (state.user) {
-          try {
-            await fetch('/api/checkins', {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ date: dateKey, trained: willBeTrained })
-            });
-          } catch (e) {
-            console.warn('Erro ao salvar check-in no servidor:', e);
-          }
-        }
-      });
-    }
-
+    s.addEventListener('click', () => toggleCheckinDate(dateKey));
     el.appendChild(s);
   }
 }
 
-function updateCalendarSummary() {
-  const currentMonthPrefix = `${state.year}-${pad(state.month + 1)}`;
-  const count = state.trained.filter(x => x.startsWith(currentMonthPrefix)).length;
+async function toggleCheckinDate(dateKey) {
+  const isTrained = state.trained.includes(dateKey);
+  const willBeTrained = !isTrained;
 
-  const countEl = document.getElementById('monthCount');
-  if (countEl) countEl.textContent = count;
-
-  const progressEl = document.getElementById('monthProgress');
-  if (progressEl) {
-    const pct = Math.min(100, (count / 24) * 100);
-    progressEl.style.width = `${pct}%`;
+  if (willBeTrained) {
+    state.trained = [...new Set([...state.trained, dateKey])];
+  } else {
+    state.trained = state.trained.filter(x => x !== dateKey);
   }
 
-  const titleEl = document.getElementById('calendarTitle');
-  if (titleEl) {
-    titleEl.textContent = `${monthNames[state.month]} ${state.year}`;
+  localStorage.setItem('fitia-trained', JSON.stringify(state.trained));
+  renderCalendars();
+
+  const formattedDate = dateKey.split('-').reverse().join('/');
+  toast(willBeTrained ? `Treino registrado para ${formattedDate}! ✦` : `Treino desmarcado (${formattedDate}).`);
+
+  // Sincroniza com o servidor se logado
+  if (state.user) {
+    try {
+      await fetch('/api/checkins', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date: dateKey, trained: willBeTrained })
+      });
+    } catch (e) {
+      console.warn('Falha na sincronização de check-in:', e);
+    }
+  }
+}
+
+function updateCalendarSummaries() {
+  const currentPrefix = `${state.year}-${pad(state.month + 1)}`;
+  const count = state.trained.filter(x => x.startsWith(currentPrefix)).length;
+  const goal = state.settings.monthlyGoal || 24;
+  const pct = Math.min(100, Math.round((count / goal) * 100));
+  const streak = calculateStreak();
+
+  // Título dos calendários
+  const titleText = `${monthNames[state.month]} ${state.year}`;
+  const calTitle = document.getElementById('calendarTitle');
+  if (calTitle) calTitle.textContent = titleText;
+  const miniTitle = document.getElementById('miniCalendarTitle');
+  if (miniTitle) miniTitle.textContent = titleText;
+
+  // Overview metrics
+  const monthCountEl = document.getElementById('monthlyWorkoutCount');
+  if (monthCountEl) monthCountEl.innerHTML = `${count} <small>/ ${goal} treinos</small>`;
+  const overviewProgress = document.getElementById('overviewMonthProgress');
+  if (overviewProgress) overviewProgress.style.width = `${pct}%`;
+  const monthPctDisplay = document.getElementById('monthPctDisplay');
+  if (monthPctDisplay) monthPctDisplay.textContent = `${pct}%`;
+
+  // Streak cards
+  const streakCount = document.getElementById('streakCount');
+  if (streakCount) streakCount.innerHTML = `${streak} <small>dias seguidos</small>`;
+  const summaryStreak = document.getElementById('summaryStreakNumber');
+  if (summaryStreak) summaryStreak.textContent = `${streak} dias seguidos`;
+
+  // Full calendar summary
+  const summaryCount = document.getElementById('monthCount');
+  if (summaryCount) summaryCount.textContent = count;
+  const summaryProgress = document.getElementById('monthProgress');
+  if (summaryProgress) summaryProgress.style.width = `${pct}%`;
+  const summaryGoalNumber = document.getElementById('summaryGoalNumber');
+  if (summaryGoalNumber) summaryGoalNumber.textContent = `${goal} treinos`;
+
+  // Botão de check-in de hoje
+  const isTodayTrained = state.trained.includes(state.todayStr);
+  const todayToggleText = document.getElementById('todayToggleText');
+  if (todayToggleText) {
+    todayToggleText.textContent = isTodayTrained ? 'Treino de hoje concluído ✓' : 'Registrar treino de hoje';
   }
 }
 
 // ==========================================================================
-// MÓDULO DE AUTENTICAÇÃO E MODAL
+// CARREGAMENTO E RENDERIZAÇÃO DOS TREINOS
 // ==========================================================================
+async function loadWorkouts() {
+  try {
+    const res = await fetch('/api/workouts');
+    if (res.ok) {
+      state.workouts = await res.json();
+      renderFeaturedWorkouts();
+      renderAllWorkouts(state.workouts);
+    }
+  } catch (err) {
+    console.warn('API de treinos indisponível, usando fallback local.');
+  }
+}
 
-const modal = document.getElementById('loginModal');
+function getVisualClass(category) {
+  const cat = (category || '').toLowerCase();
+  if (cat.includes('força')) return 'visual-strength';
+  if (cat.includes('cardio')) return 'visual-cardio';
+  if (cat.includes('mobilidade')) return 'visual-mobility';
+  return 'visual-home';
+}
+
+function renderFeaturedWorkouts() {
+  const container = document.getElementById('featuredWorkoutsGrid');
+  if (!container || !state.workouts.length) return;
+
+  const featured = state.workouts.slice(0, 3);
+  container.innerHTML = featured.map(w => `
+    <article class="workout-card">
+      <div class="workout-visual ${getVisualClass(w.category)}">
+        <span class="visual-badge">${w.category.toUpperCase()}</span>
+        <span class="visual-tag-right">${w.duration} MIN</span>
+      </div>
+      <div class="workout-body">
+        <div>
+          <p class="card-kicker">${w.level.toUpperCase()} · ~${w.calories || 300} KCAL</p>
+          <h3>${w.title}</h3>
+        </div>
+        <button class="round-arrow btn-start-workout" data-id="${w.id}" aria-label="Iniciar treino ${w.title}">→</button>
+      </div>
+    </article>
+  `).join('');
+
+  container.querySelectorAll('.btn-start-workout').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const workout = state.workouts.find(w => w.id === btn.dataset.id);
+      if (workout) openWorkoutModal(workout);
+    });
+  });
+}
+
+function renderAllWorkouts(list) {
+  const container = document.getElementById('allWorkoutsList');
+  if (!container) return;
+
+  if (!list.length) {
+    container.innerHTML = `
+      <div class="panel" style="text-align: center; padding: 48px 20px;">
+        <span style="font-size: 32px; display: block; margin-bottom: 12px;">🔍</span>
+        <strong style="font-size: 16px;">Nenhum treino encontrado</strong>
+        <p style="color: var(--muted); font-size: 13px; margin-top: 6px;">Tente buscar com outro termo ou selecione a categoria "Todos".</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = list.map(w => `
+    <article class="wide-workout">
+      <div class="workout-visual ${getVisualClass(w.category)}">
+        <span class="visual-badge">${w.category.toUpperCase()}</span>
+      </div>
+      <div class="wide-workout-content">
+        <div>
+          <div class="workout-meta-pills">
+            <span class="meta-pill">⏱️ ${w.duration} min</span>
+            <span class="meta-pill">🔥 ~${w.calories || 300} kcal</span>
+            <span class="meta-pill">📊 ${w.level}</span>
+          </div>
+          <h2>${w.title}</h2>
+          <p>${w.description || 'Treino completo com foco em evolução e consistência.'}</p>
+        </div>
+        <div>
+          <button class="primary-button small btn-start-wide" data-id="${w.id}">
+            <span>▶</span> Iniciar treino agora
+          </button>
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  container.querySelectorAll('.btn-start-wide').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const workout = state.workouts.find(w => w.id === btn.dataset.id);
+      if (workout) openWorkoutModal(workout);
+    });
+  });
+}
+
+function setupWorkoutFilters() {
+  const searchInput = document.getElementById('workoutSearchInput');
+  const filterBtns = document.querySelectorAll('.filter-row .filter');
+
+  let activeCategory = 'Todos';
+
+  function applyFilters() {
+    const term = (searchInput?.value || '').toLowerCase().trim();
+    const filtered = state.workouts.filter(w => {
+      const matchesCategory = activeCategory === 'Todos' || w.category.toLowerCase() === activeCategory.toLowerCase();
+      const matchesSearch = !term || w.title.toLowerCase().includes(term) || (w.description || '').toLowerCase().includes(term);
+      return matchesCategory && matchesSearch;
+    });
+    renderAllWorkouts(filtered);
+  }
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCategory = btn.dataset.filter || 'Todos';
+      applyFilters();
+    });
+  });
+
+  searchInput?.addEventListener('input', applyFilters);
+}
+
+// ==========================================================================
+// MODAL DE SESSÃO DE TREINO (CRONÔMETRO + CHECKLIST)
+// ==========================================================================
+const workoutModal = document.getElementById('workoutModal');
+
+function openWorkoutModal(workout) {
+  state.currentWorkoutSession = workout;
+  state.timerSeconds = 0;
+  stopWorkoutTimer();
+
+  document.getElementById('workoutModalTitle').textContent = workout.title;
+  document.getElementById('workoutModalCategory').textContent = workout.category.toUpperCase();
+  document.getElementById('workoutModalDesc').textContent = workout.description || '';
+  updateTimerDisplay();
+
+  const listContainer = document.getElementById('workoutExercisesList');
+  if (listContainer) {
+    const exercises = workout.exercises && workout.exercises.length ? workout.exercises : [
+      'Aquecimento articular dinâmico (3 min)',
+      'Série principal de ativação (3 séries)',
+      'Circuito de força e queima calórica',
+      'Desaquecimento e respiração controlada'
+    ];
+
+    listContainer.innerHTML = exercises.map((ex, idx) => `
+      <label class="exercise-item" for="ex-${idx}">
+        <input type="checkbox" class="exercise-checkbox" id="ex-${idx}" />
+        <span>${ex}</span>
+      </label>
+    `).join('');
+
+    listContainer.querySelectorAll('.exercise-item').forEach(label => {
+      const chk = label.querySelector('input');
+      chk.addEventListener('change', () => {
+        label.classList.toggle('checked', chk.checked);
+      });
+    });
+  }
+
+  workoutModal?.classList.add('open');
+}
+
+function closeWorkoutModal() {
+  stopWorkoutTimer();
+  workoutModal?.classList.remove('open');
+}
+
+function updateTimerDisplay() {
+  const mins = pad(Math.floor(state.timerSeconds / 60));
+  const secs = pad(state.timerSeconds % 60);
+  const display = document.getElementById('workoutTimerDisplay');
+  if (display) display.textContent = `${mins}:${secs}`;
+}
+
+function startWorkoutTimer() {
+  state.timerRunning = true;
+  const btn = document.getElementById('btnToggleTimer');
+  if (btn) btn.textContent = '⏸ Pausar cronômetro';
+  state.timerInterval = setInterval(() => {
+    state.timerSeconds++;
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function stopWorkoutTimer() {
+  state.timerRunning = false;
+  const btn = document.getElementById('btnToggleTimer');
+  if (btn) btn.textContent = '▶ Iniciar cronômetro';
+  clearInterval(state.timerInterval);
+}
+
+function setupWorkoutRunner() {
+  document.getElementById('closeWorkoutModal')?.addEventListener('click', closeWorkoutModal);
+
+  document.getElementById('btnToggleTimer')?.addEventListener('click', () => {
+    if (state.timerRunning) {
+      stopWorkoutTimer();
+    } else {
+      startWorkoutTimer();
+    }
+  });
+
+  document.getElementById('btnResetTimer')?.addEventListener('click', () => {
+    stopWorkoutTimer();
+    state.timerSeconds = 0;
+    updateTimerDisplay();
+  });
+
+  document.getElementById('btnFinishWorkout')?.addEventListener('click', async () => {
+    closeWorkoutModal();
+
+    // Marca o check-in de hoje
+    if (!state.trained.includes(state.todayStr)) {
+      await toggleCheckinDate(state.todayStr);
+    }
+    toast(`Parabéns! Sessão "${state.currentWorkoutSession?.title}" concluída com sucesso! 🏆`);
+  });
+
+  document.getElementById('btnQuickWorkout')?.addEventListener('click', () => {
+    if (state.workouts.length) {
+      openWorkoutModal(state.workouts[0]);
+    } else {
+      go('treinos');
+    }
+  });
+}
+
+// ==========================================================================
+// MODAL FIT.IA PRO
+// ==========================================================================
+const proModal = document.getElementById('proModal');
+
+function setupProModal() {
+  document.getElementById('btnOpenPro')?.addEventListener('click', () => {
+    proModal?.classList.add('open');
+  });
+
+  document.getElementById('closeProModal')?.addEventListener('click', () => {
+    proModal?.classList.remove('open');
+  });
+
+  proModal?.addEventListener('click', e => {
+    if (e.target === proModal) proModal.classList.remove('open');
+  });
+
+  document.getElementById('btnTryPro')?.addEventListener('click', () => {
+    proModal?.classList.remove('open');
+    const roleEl = document.getElementById('sidebarRole');
+    if (roleEl) roleEl.textContent = 'Plano Pro ✦ (Ativo)';
+    toast('🎉 Parabéns! Seus 7 dias grátis de Fit.IA Pro foram ativados com sucesso!');
+  });
+}
+
+// ==========================================================================
+// POPOVER DE NOTIFICAÇÕES
+// ==========================================================================
+function setupNotifications() {
+  const btn = document.getElementById('btnNotifications');
+  const popover = document.getElementById('notificationsPopover');
+  const dot = document.getElementById('notifDot');
+
+  btn?.addEventListener('click', e => {
+    e.stopPropagation();
+    popover?.classList.toggle('show');
+    if (dot) dot.style.display = 'none';
+  });
+
+  document.addEventListener('click', e => {
+    if (!popover?.contains(e.target) && e.target !== btn) {
+      popover?.classList.remove('show');
+    }
+  });
+}
+
+// ==========================================================================
+// CONFIGURAÇÕES DA CONTA
+// ==========================================================================
+function setupSettings() {
+  const toggleRem = document.getElementById('toggleReminders');
+  const toggleRep = document.getElementById('toggleWeeklyReport');
+  const selectGoal = document.getElementById('settingMonthlyGoal');
+  const selectUnit = document.getElementById('settingUnit');
+  const btnSave = document.getElementById('btnSaveSettings');
+
+  if (toggleRem) toggleRem.classList.toggle('on', state.settings.reminders);
+  if (toggleRep) toggleRep.classList.toggle('on', state.settings.weeklyReport);
+  if (selectGoal) selectGoal.value = String(state.settings.monthlyGoal);
+  if (selectUnit) selectUnit.value = state.settings.unit;
+
+  toggleRem?.addEventListener('click', () => toggleRem.classList.toggle('on'));
+  toggleRep?.addEventListener('click', () => toggleRep.classList.toggle('on'));
+
+  btnSave?.addEventListener('click', () => {
+    state.settings.reminders = toggleRem ? toggleRem.classList.contains('on') : true;
+    state.settings.weeklyReport = toggleRep ? toggleRep.classList.contains('on') : true;
+    state.settings.monthlyGoal = selectGoal ? Number(selectGoal.value) : 24;
+    state.settings.unit = selectUnit ? selectUnit.value : 'kg';
+
+    localStorage.setItem('fitia-reminders', JSON.stringify(state.settings.reminders));
+    localStorage.setItem('fitia-weekly-report', JSON.stringify(state.settings.weeklyReport));
+    localStorage.setItem('fitia-monthly-goal', String(state.settings.monthlyGoal));
+    localStorage.setItem('fitia-unit', state.settings.unit);
+
+    updateCalendarSummaries();
+    toast('Preferências salvas com sucesso! ✦');
+  });
+}
+
+// ==========================================================================
+// MÓDULO DE AUTENTICAÇÃO (LOGIN / REGISTRO)
+// ==========================================================================
+const loginModal = document.getElementById('loginModal');
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 
 function openAuthModal(defaultTab = 'login') {
-  if (!modal) return;
-  modal.classList.add('open');
+  if (!loginModal) return;
+  loginModal.classList.add('open');
   switchTab(defaultTab);
   clearAuthErrors();
 }
 
 function closeAuthModal() {
-  if (!modal) return;
-  modal.classList.remove('open');
+  if (!loginModal) return;
+  loginModal.classList.remove('open');
   clearAuthErrors();
 }
 
-// Alternador de Abas (Entrar / Criar Conta)
 function switchTab(tab) {
   const isLogin = tab === 'login';
 
@@ -203,7 +592,6 @@ function validateEmail(val) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(String(val).trim());
 }
 
-// Atualização de elementos de UI do usuário autenticado
 function updateAuthUI(user) {
   state.user = user;
   const loginButtonLabel = document.getElementById('loginButtonLabel');
@@ -211,6 +599,7 @@ function updateAuthUI(user) {
   const sidebarName = document.getElementById('sidebarName');
   const sidebarAvatar = document.getElementById('sidebarAvatar');
   const sidebarRole = document.getElementById('sidebarRole');
+  const welcomeUserName = document.getElementById('welcomeUserName');
 
   if (user) {
     const firstName = user.name.trim().split(' ')[0] || 'Usuário';
@@ -227,16 +616,17 @@ function updateAuthUI(user) {
     if (sidebarName) sidebarName.textContent = user.name;
     if (sidebarAvatar) sidebarAvatar.textContent = initials;
     if (sidebarRole) sidebarRole.textContent = user.email;
+    if (welcomeUserName) welcomeUserName.textContent = firstName;
   } else {
     if (loginButtonLabel) loginButtonLabel.textContent = 'Entrar';
     if (loginButtonIcon) loginButtonIcon.textContent = '↗';
     if (sidebarName) sidebarName.textContent = 'Visitante';
     if (sidebarAvatar) sidebarAvatar.textContent = '??';
     if (sidebarRole) sidebarRole.textContent = 'Plano gratuito';
+    if (welcomeUserName) welcomeUserName.textContent = 'Atleta';
   }
 }
 
-// Carregar sessão existente
 async function checkAuthSession() {
   try {
     const res = await fetch('/api/auth/me');
@@ -246,19 +636,15 @@ async function checkAuthSession() {
         updateAuthUI(data.user);
         closeAuthModal();
 
-        // Carregar check-ins do usuário no backend
         const checkinsRes = await fetch('/api/checkins');
         if (checkinsRes.ok) {
           const checkins = await checkinsRes.json();
           if (Array.isArray(checkins)) {
             state.trained = checkins;
             localStorage.setItem('fitia-trained', JSON.stringify(state.trained));
-            renderCalendar('miniCalendar');
-            renderCalendar('fullCalendar', true);
-            updateCalendarSummary();
+            renderCalendars();
           }
         }
-        return;
       }
     }
   } catch (err) {
@@ -266,7 +652,6 @@ async function checkAuthSession() {
   }
 }
 
-// Envio do formulário de login
 async function handleLoginSubmit(e) {
   e.preventDefault();
   clearAuthErrors();
@@ -301,7 +686,6 @@ async function handleLoginSubmit(e) {
 
   if (hasError) return;
 
-  // Chamada à API
   submitBtn.disabled = true;
   submitBtn.classList.add('is-loading');
 
@@ -320,25 +704,21 @@ async function handleLoginSubmit(e) {
       return;
     }
 
-    // Sucesso!
     updateAuthUI(data.user);
     closeAuthModal();
     toast(`Bem-vindo de volta, ${data.user.name.split(' ')[0]}! ✦`);
 
-    // Sincroniza dados do backend
     const checkinsRes = await fetch('/api/checkins');
     if (checkinsRes.ok) {
       const checkins = await checkinsRes.json();
       if (Array.isArray(checkins)) {
         state.trained = checkins;
         localStorage.setItem('fitia-trained', JSON.stringify(state.trained));
-        renderCalendar('miniCalendar');
-        renderCalendar('fullCalendar', true);
-        updateCalendarSummary();
+        renderCalendars();
       }
     }
   } catch (error) {
-    statusEl.textContent = 'Erro de conexão com o servidor. Verifique se o servidor está ativo.';
+    statusEl.textContent = 'Erro ao conectar ao servidor.';
     statusEl.className = 'form-status error';
   } finally {
     submitBtn.disabled = false;
@@ -346,7 +726,6 @@ async function handleLoginSubmit(e) {
   }
 }
 
-// Envio do formulário de cadastro
 async function handleRegisterSubmit(e) {
   e.preventDefault();
   clearAuthErrors();
@@ -413,17 +792,13 @@ async function handleRegisterSubmit(e) {
       return;
     }
 
-    // Sucesso!
     updateAuthUI(data.user);
     closeAuthModal();
     toast(`Conta criada com sucesso! Bem-vindo(a), ${data.user.name.split(' ')[0]}! ✦`);
 
-    // Inicia checkins vazios para novo usuário
     state.trained = [];
     localStorage.setItem('fitia-trained', JSON.stringify([]));
-    renderCalendar('miniCalendar');
-    renderCalendar('fullCalendar', true);
-    updateCalendarSummary();
+    renderCalendars();
   } catch (error) {
     statusEl.textContent = 'Erro ao conectar ao servidor.';
     statusEl.className = 'form-status error';
@@ -433,7 +808,6 @@ async function handleRegisterSubmit(e) {
   }
 }
 
-// Logout do usuário
 async function handleLogout() {
   try {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -444,7 +818,6 @@ async function handleLogout() {
   toast('Você saiu da sua conta.');
 }
 
-// Alternar visibilidade de senhas
 function setupPasswordToggles() {
   const toggleLogin = document.getElementById('togglePassword');
   const inputLogin = document.getElementById('loginPassword');
@@ -469,7 +842,6 @@ function setupPasswordToggles() {
   });
 }
 
-// Preencher e disparar conta de demonstração
 function setupDemoLogin() {
   const btnDemo = document.getElementById('btnDemoLogin');
   btnDemo?.addEventListener('click', () => {
@@ -481,69 +853,60 @@ function setupDemoLogin() {
   });
 }
 
-// Inicialização dos eventos do aplicativo
+// ==========================================================================
+// INICIALIZAÇÃO GERAL DA APLICAÇÃO
+// ==========================================================================
 function initApp() {
-  // Navegação
+  // Navegação por rotas
   document.querySelectorAll('[data-route]').forEach(a => {
     a.addEventListener('click', e => {
       e.preventDefault();
-      go(a.dataset.route);
+      const route = a.dataset.route || a.getAttribute('href')?.replace('#', '');
+      if (route) go(route);
     });
   });
 
-  document.querySelectorAll('[data-scroll="treinos"]').forEach(b => {
-    b.addEventListener('click', () => go('treinos'));
-  });
-
-  // Mudar meses no calendário
-  document.querySelectorAll('.month-arrow').forEach(b => {
-    if (b.id === 'prevMonth') {
-      b.onclick = () => {
-        state.month--;
-        if (state.month < 0) {
-          state.month = 11;
-          state.year--;
-        }
-        renderCalendar('fullCalendar', true);
-        renderCalendar('miniCalendar');
-        updateCalendarSummary();
-      };
+  // Navegação de mês no calendário
+  const prevMonthAction = () => {
+    state.month--;
+    if (state.month < 0) {
+      state.month = 11;
+      state.year--;
     }
-    if (b.id === 'nextMonth') {
-      b.onclick = () => {
-        state.month++;
-        if (state.month > 11) {
-          state.month = 0;
-          state.year++;
-        }
-        renderCalendar('fullCalendar', true);
-        renderCalendar('miniCalendar');
-        updateCalendarSummary();
-      };
-    }
-  });
+    renderCalendars();
+  };
 
-  // Menu móvel
+  const nextMonthAction = () => {
+    state.month++;
+    if (state.month > 11) {
+      state.month = 0;
+      state.year++;
+    }
+    renderCalendars();
+  };
+
+  document.getElementById('prevMonth')?.addEventListener('click', prevMonthAction);
+  document.getElementById('nextMonth')?.addEventListener('click', nextMonthAction);
+  document.getElementById('miniPrevMonth')?.addEventListener('click', prevMonthAction);
+  document.getElementById('miniNextMonth')?.addEventListener('click', nextMonthAction);
+
+  // Botões de registrar treino de hoje
+  document.getElementById('btnToggleTodayCheckin')?.addEventListener('click', () => toggleCheckinDate(state.todayStr));
+  document.getElementById('btnMarkTodayLarge')?.addEventListener('click', () => toggleCheckinDate(state.todayStr));
+
+  // Menu Mobile Drawer
   document.getElementById('mobileMenu')?.addEventListener('click', () => {
-    document.querySelector('.sidebar')?.classList.toggle('open');
+    document.getElementById('sidebar')?.classList.add('open');
   });
 
-  // Filtros de treino e toggles de configuração
-  document.querySelectorAll('.filter').forEach(b => {
-    b.onclick = () => {
-      document.querySelectorAll('.filter').forEach(x => x.classList.remove('active'));
-      b.classList.add('active');
-    };
+  document.getElementById('mobileCloseSidebar')?.addEventListener('click', () => {
+    document.getElementById('sidebar')?.classList.remove('open');
   });
 
-  document.querySelectorAll('.toggle').forEach(b => {
-    b.onclick = () => b.classList.toggle('on');
-  });
-
-  // Controle do Modal de Autenticação
+  // Modal Auth
   document.getElementById('loginButton')?.addEventListener('click', () => {
     if (state.user) {
-      if (confirm(`Deseja sair da conta (${state.user.name})?`)) {
+      if (confirm(`Conectado como ${state.user.name}. Deseja sair?`)) {
         handleLogout();
       }
     } else {
@@ -551,9 +914,16 @@ function initApp() {
     }
   });
 
+  document.getElementById('sidebarLogout')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (confirm('Deseja realmente sair da sua conta?')) {
+      handleLogout();
+    }
+  });
+
   document.getElementById('profileButton')?.addEventListener('click', () => {
     if (state.user) {
-      if (confirm(`Conectado como ${state.user.name} (${state.user.email}). Deseja desconectar?`)) {
+      if (confirm(`Conectado como ${state.user.name} (${state.user.email}). Deseja sair?`)) {
         handleLogout();
       }
     } else {
@@ -563,50 +933,49 @@ function initApp() {
 
   document.getElementById('closeModal')?.addEventListener('click', closeAuthModal);
 
-  modal?.addEventListener('click', e => {
-    if (e.target === modal) closeAuthModal();
+  loginModal?.addEventListener('click', e => {
+    if (e.target === loginModal) closeAuthModal();
   });
 
   window.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && modal?.classList.contains('open')) {
-      closeAuthModal();
+    if (e.key === 'Escape') {
+      if (loginModal?.classList.contains('open')) closeAuthModal();
+      if (workoutModal?.classList.contains('open')) closeWorkoutModal();
+      if (proModal?.classList.contains('open')) proModal.classList.remove('open');
     }
   });
 
-  // Alternadores de aba
   document.getElementById('tabLogin')?.addEventListener('click', () => switchTab('login'));
   document.getElementById('tabRegister')?.addEventListener('click', () => switchTab('register'));
   document.getElementById('switchRegister')?.addEventListener('click', () => switchTab('register'));
   document.getElementById('switchLogin')?.addEventListener('click', () => switchTab('login'));
 
-  // Esqueci minha senha
   document.getElementById('forgotPassword')?.addEventListener('click', e => {
     e.preventDefault();
-    toast('Instruções para redefinir a senha serão enviadas para o seu e-mail.');
+    toast('Instruções de redefinição serão enviadas para o seu e-mail.');
   });
 
-  // Login Social
   document.getElementById('btnGoogleLogin')?.addEventListener('click', () => {
-    toast('Login com Google em desenvolvimento. Use o formulário ou a conta demo.');
+    toast('Login com Google em desenvolvimento. Use a conta demo!');
   });
 
-  // Submissão de Formulários
   loginForm?.addEventListener('submit', handleLoginSubmit);
   registerForm?.addEventListener('submit', handleRegisterSubmit);
 
   setupPasswordToggles();
   setupDemoLogin();
+  setupWorkoutFilters();
+  setupWorkoutRunner();
+  setupProModal();
+  setupNotifications();
+  setupSettings();
 
-  // Render inicial dos calendários
-  renderCalendar('miniCalendar');
-  renderCalendar('fullCalendar', true);
-  updateCalendarSummary();
-
-  // Verificar se há sessão ativa no servidor
+  // Render inicial
+  renderCalendars();
+  loadWorkouts();
   checkAuthSession();
 }
 
-// Inicializar quando o DOM estiver pronto
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initApp);
 } else {

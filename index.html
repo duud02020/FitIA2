@@ -3,53 +3,453 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Fit.IA — seu espaço para treinos, evolução e constância." />
-    <title>Fit.IA | Treine no seu ritmo</title>
+    <meta name="description" content="Fit.IA — seu espaço inteligente para treinos, evolução e constância." />
+    <title>Fit.IA | Treine no seu melhor ritmo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="app-shell">
-      <aside class="sidebar">
-        <a class="brand" href="#inicio" aria-label="Fit.IA início"><span class="brand-mark">F</span><span>Fit<span class="brand-dot">.IA</span></span></a>
-        <div class="sidebar-label">Menu principal</div>
+      <!-- SIDEBAR NAVEGAÇÃO -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-top">
+          <a class="brand" href="#inicio" aria-label="Fit.IA início">
+            <span class="brand-mark">F</span>
+            <span>Fit<span class="brand-dot">.IA</span></span>
+          </a>
+          <button class="mobile-close" id="mobileCloseSidebar" aria-label="Fechar menu">✕</button>
+        </div>
+
+        <div class="sidebar-label">MENU PRINCIPAL</div>
         <nav class="main-nav" aria-label="Navegação principal">
-          <a class="nav-link active" href="#inicio" data-route="inicio"><span class="nav-icon">⌂</span>Visão geral</a>
-          <a class="nav-link" href="#treinos" data-route="treinos"><span class="nav-icon">◈</span>Meus treinos</a>
-          <a class="nav-link" href="#calendario" data-route="calendario"><span class="nav-icon">▣</span>Calendário</a>
+          <a class="nav-link active" href="#inicio" data-route="inicio">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </span>
+            <span>Visão geral</span>
+          </a>
+
+          <a class="nav-link" href="#treinos" data-route="treinos">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1a5 5 0 0 0-7.07 0l-.93.93a5 5 0 0 1-7.07 0l-1-1"/><path d="m3 3 1 1a5 5 0 0 0 7.07 0l.93-.93a5 5 0 0 1 7.07 0l1 1"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+            </span>
+            <span>Biblioteca de treinos</span>
+          </a>
+
+          <a class="nav-link" href="#calendario" data-route="calendario">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+            </span>
+            <span>Calendário de constância</span>
+          </a>
         </nav>
+
         <div class="sidebar-spacer"></div>
-        <div class="pro-card"><span class="spark">✦</span><strong>Desbloqueie seu potencial</strong><p>Tenha acesso a planos personalizados.</p><button class="text-button">Conhecer Fit.IA Pro <span>→</span></button></div>
-        <a class="nav-link muted" href="#configuracoes" data-route="configuracoes"><span class="nav-icon">⚙</span>Configurações</a>
-        <button class="profile-mini" id="profileButton" aria-label="Conta do usuário"><span class="avatar" id="sidebarAvatar">JS</span><span class="profile-info"><strong id="sidebarName">João Silva</strong><small id="sidebarRole">Plano gratuito</small></span><span class="more" id="sidebarAction">•••</span></button>
+
+        <!-- CARD PRO UPGRADE -->
+        <div class="pro-card" id="proBanner">
+          <div class="pro-badge"><span class="spark">✦</span> FIT.IA PRO</div>
+          <strong>Desbloqueie seu potencial</strong>
+          <p>Treinos gerados por IA, macros nutricionais e análise de rendimento.</p>
+          <button class="pro-button" id="btnOpenPro">Conhecer planos <span>→</span></button>
+        </div>
+
+        <nav class="sidebar-settings-nav">
+          <a class="nav-link muted" href="#configuracoes" data-route="configuracoes">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </span>
+            <span>Configurações</span>
+          </a>
+        </nav>
+
+        <!-- PERFIL SIDEBAR -->
+        <div class="profile-card">
+          <div class="profile-main" id="profileButton" role="button" tabindex="0" title="Informações da conta">
+            <span class="avatar" id="sidebarAvatar">JS</span>
+            <div class="profile-info">
+              <strong id="sidebarName">João Silva</strong>
+              <small id="sidebarRole">Plano gratuito</small>
+            </div>
+          </div>
+          <button class="logout-button" id="sidebarLogout" title="Sair da conta" aria-label="Sair da conta">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
       </aside>
 
+      <!-- ÁREA PRINCIPAL -->
       <main class="content">
-        <header class="topbar"><button class="mobile-menu" id="mobileMenu" aria-label="Abrir menu">☰</button><div class="breadcrumbs"><span>Workspace</span><b>/</b><strong id="pageName">Visão geral</strong></div><div class="top-actions"><button class="icon-button" aria-label="Notificações">♧<i></i></button><button class="outline-button" id="loginButton"><span id="loginButtonIcon">↗</span> <span id="loginButtonLabel">Entrar</span></button></div></header>
+        <!-- TOPBAR SUPERIOR -->
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="mobile-menu" id="mobileMenu" aria-label="Abrir menu de navegação">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="breadcrumbs">
+              <span class="crumb-root">Fit.IA</span>
+              <span class="crumb-separator">/</span>
+              <strong id="pageName">Visão geral</strong>
+            </div>
+          </div>
 
+          <div class="top-actions">
+            <!-- NOTIFICAÇÕES -->
+            <div class="popover-wrapper">
+              <button class="icon-button" id="btnNotifications" aria-label="Notificações" title="Ver notificações">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <i class="notification-dot" id="notifDot"></i>
+              </button>
+
+              <div class="notifications-popover" id="notificationsPopover">
+                <div class="popover-header">
+                  <strong>Notificações</strong>
+                  <span class="badge-count">3 novas</span>
+                </div>
+                <div class="notifications-list">
+                  <div class="notification-item">
+                    <span class="notif-icon orange">🔥</span>
+                    <div>
+                      <strong>Sequência em alta!</strong>
+                      <p>Você completou treinos consecutivos. Mantenha o ritmo hoje!</p>
+                      <small>Há 20 minutos</small>
+                    </div>
+                  </div>
+                  <div class="notification-item">
+                    <span class="notif-icon green">✦</span>
+                    <div>
+                      <strong>Meta mensal atingida em 75%</strong>
+                      <p>Faltam apenas 6 treinos para fechar o mês com chave de ouro.</p>
+                      <small>Hoje às 08:00</small>
+                    </div>
+                  </div>
+                  <div class="notification-item">
+                    <span class="notif-icon purple">⚡</span>
+                    <div>
+                      <strong>Novo treino liberado</strong>
+                      <p>Experimente o "Core & Abdômen blindado" para treinar em casa.</p>
+                      <small>Ontem</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BOTÃO DE LOGIN / CONTA -->
+            <button class="outline-button auth-indicator-btn" id="loginButton">
+              <span id="loginButtonIcon">↗</span>
+              <span id="loginButtonLabel">Entrar</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- ==========================================
+             VIEW 1: VISÃO GERAL (DASHBOARD)
+             ========================================== -->
         <section class="view active-view" id="view-inicio">
-          <div class="welcome-row"><div><p class="eyebrow">SEGUNDA-FEIRA, 28 DE SETEMBRO</p><h1>Bom dia, João <span>✦</span></h1><p class="subheading">Pronto para dar mais um passo hoje?</p></div><button class="primary-button" data-scroll="treinos"><span>＋</span> Novo treino</button></div>
-          <div class="stats-grid"><article class="stat-card accent"><div class="stat-top"><span class="stat-label">Sequência atual</span><span class="stat-icon">✦</span></div><strong>12 <small>dias</small></strong><div class="stat-trend positive">↗ +3 dias <span>vs. semana passada</span></div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Treinos no mês</span><span class="stat-icon soft">◒</span></div><strong>18 <small>/ 24</small></strong><div class="progress"><span style="width:75%"></span></div><div class="stat-caption">75% da sua meta mensal</div></article><article class="stat-card"><div class="stat-top"><span class="stat-label">Tempo total</span><span class="stat-icon soft">◷</span></div><strong>14h <small>32min</small></strong><div class="stat-trend positive">↗ +12% <span>este mês</span></div></article></div>
-          <div class="section-heading"><div><p class="eyebrow">PARA VOCÊ</p><h2>Escolha seu próximo treino</h2></div><a href="#treinos" class="see-all">Ver todos <span>→</span></a></div>
-          <div class="workout-grid"><article class="workout-card featured"><div class="workout-visual strength"><span class="visual-label">MAIS POPULAR</span><span class="visual-circle">↗</span></div><div class="workout-body"><div><p class="card-kicker">FORÇA · 45 MIN</p><h3>Full body express</h3></div><button class="round-arrow" aria-label="Iniciar treino">→</button></div></article><article class="workout-card"><div class="workout-visual running"><span class="visual-circle">↗</span></div><div class="workout-body"><div><p class="card-kicker">CARDIO · 30 MIN</p><h3>Corrida intervalada</h3></div><button class="round-arrow" aria-label="Iniciar treino">→</button></div></article><article class="workout-card"><div class="workout-visual yoga"><span class="visual-circle">↗</span></div><div class="workout-body"><div><p class="card-kicker">MOBILIDADE · 20 MIN</p><h3>Flow para começar</h3></div><button class="round-arrow" aria-label="Iniciar treino">→</button></div></article></div>
-          <div class="lower-grid"><section class="panel calendar-panel"><div class="panel-heading"><div><p class="eyebrow">CONSTÂNCIA</p><h2>Seu calendário</h2></div><a href="#calendario">Abrir calendário <span>→</span></a></div><div class="mini-calendar"><div class="calendar-month"><button class="month-arrow">←</button><strong>Setembro 2026</strong><button class="month-arrow">→</button></div><div class="weekdays"><span>SEG</span><span>TER</span><span>QUA</span><span>QUI</span><span>SEX</span><span>SÁB</span><span>DOM</span></div><div class="calendar-days" id="miniCalendar"></div></div></section><section class="panel activity-panel"><div class="panel-heading"><div><p class="eyebrow">RECENTE</p><h2>Atividade recente</h2></div><span class="tiny-badge">Esta semana</span></div><div class="activity-list"><div class="activity"><span class="activity-icon orange">◒</span><div><strong>Upper body</strong><small>Hoje, 08:30 · 42 min</small></div><b>+320 kcal</b></div><div class="activity"><span class="activity-icon green">♧</span><div><strong>Corrida leve</strong><small>Ontem, 18:10 · 28 min</small></div><b>+240 kcal</b></div><div class="activity"><span class="activity-icon purple">♢</span><div><strong>Alongamento</strong><small>26 set, 07:45 · 20 min</small></div><b>+90 kcal</b></div></div></section></div>
+          <!-- HERO BOAS-VINDAS -->
+          <div class="welcome-row">
+            <div>
+              <p class="eyebrow" id="currentDateDisplay">SEGUNDA-FEIRA, 28 DE SETEMBRO</p>
+              <h1 id="welcomeUserTitle">Bom dia, <span id="welcomeUserName">João</span> <span class="sparkle">✦</span></h1>
+              <p class="subheading">Consistência constrói o resultado que a motivação começa.</p>
+            </div>
+            <div class="welcome-actions">
+              <button class="primary-button" id="btnQuickWorkout">
+                <span>＋</span> Iniciar treino
+              </button>
+            </div>
+          </div>
+
+          <!-- GRID DE MÉTRICAS EM DESTAQUE -->
+          <div class="stats-grid">
+            <article class="stat-card accent">
+              <div class="stat-top">
+                <span class="stat-label">Sequência atual</span>
+                <span class="stat-icon flame">🔥</span>
+              </div>
+              <strong id="streakCount">12 <small>dias seguidos</small></strong>
+              <div class="stat-trend positive">↗ +3 dias <span class="trend-ref">vs. semana anterior</span></div>
+            </article>
+
+            <article class="stat-card">
+              <div class="stat-top">
+                <span class="stat-label">Treinos no mês</span>
+                <span class="stat-icon">🎯</span>
+              </div>
+              <strong id="monthlyWorkoutCount">18 <small>/ 24 treinos</small></strong>
+              <div class="progress"><span id="overviewMonthProgress" style="width: 75%"></span></div>
+              <div class="stat-caption"><span id="monthPctDisplay">75%</span> da sua meta mensal concluída</div>
+            </article>
+
+            <article class="stat-card">
+              <div class="stat-top">
+                <span class="stat-label">Tempo dedicado</span>
+                <span class="stat-icon">⏱️</span>
+              </div>
+              <strong>14h <small>32min</small></strong>
+              <div class="stat-trend positive">↗ +12% <span class="trend-ref">este mês</span></div>
+            </article>
+
+            <article class="stat-card">
+              <div class="stat-top">
+                <span class="stat-label">Gasto calórico estimado</span>
+                <span class="stat-icon">⚡</span>
+              </div>
+              <strong>4.250 <small>kcal</small></strong>
+              <div class="stat-trend positive">↗ ~350 kcal/sessão</div>
+            </article>
+          </div>
+
+          <!-- SEÇÃO TREINOS RECOMENDADOS -->
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">RECOMENDADOS PARA VOCÊ</p>
+              <h2>Escolha seu próximo treino</h2>
+            </div>
+            <a href="#treinos" class="see-all" data-route="treinos">Ver todos <span>→</span></a>
+          </div>
+
+          <div class="workout-grid" id="featuredWorkoutsGrid">
+            <!-- Cards gerados dinamicamente via JS com dados reais da API -->
+          </div>
+
+          <!-- GRADE INFERIOR: MINI CALENDÁRIO + ATIVIDADES -->
+          <div class="lower-grid">
+            <section class="panel calendar-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">CONSTÂNCIA DIÁRIA</p>
+                  <h2>Check-in de treinos</h2>
+                </div>
+                <a href="#calendario" class="see-all" data-route="calendario">Abrir completo <span>→</span></a>
+              </div>
+
+              <div class="mini-calendar">
+                <div class="calendar-month">
+                  <button class="month-arrow" id="miniPrevMonth" aria-label="Mês anterior">←</button>
+                  <strong id="miniCalendarTitle">Setembro 2026</strong>
+                  <button class="month-arrow" id="miniNextMonth" aria-label="Próximo mês">→</button>
+                </div>
+                <div class="weekdays">
+                  <span>SEG</span><span>TER</span><span>QUA</span><span>QUI</span><span>SEX</span><span>SÁB</span><span>DOM</span>
+                </div>
+                <div class="calendar-days" id="miniCalendar"></div>
+              </div>
+
+              <div class="mini-calendar-footer">
+                <button class="today-toggle-btn" id="btnToggleTodayCheckin">
+                  <span>✓</span> <span id="todayToggleText">Registrar treino de hoje</span>
+                </button>
+              </div>
+            </section>
+
+            <section class="panel activity-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">HISTÓRICO</p>
+                  <h2>Atividade recente</h2>
+                </div>
+                <span class="tiny-badge">Esta semana</span>
+              </div>
+
+              <div class="activity-list">
+                <div class="activity">
+                  <span class="activity-icon orange">🏋️</span>
+                  <div>
+                    <strong>Full body express</strong>
+                    <small>Hoje, 08:30 · 45 min</small>
+                  </div>
+                  <b>+350 kcal</b>
+                </div>
+
+                <div class="activity">
+                  <span class="activity-icon green">🏃</span>
+                  <div>
+                    <strong>Corrida intervalada</strong>
+                    <small>Ontem, 18:10 · 30 min</small>
+                  </div>
+                  <b>+320 kcal</b>
+                </div>
+
+                <div class="activity">
+                  <span class="activity-icon purple">🧘</span>
+                  <div>
+                    <strong>Flow matinal para começar</strong>
+                    <small>26 set, 07:45 · 20 min</small>
+                  </div>
+                  <b>+120 kcal</b>
+                </div>
+              </div>
+            </section>
+          </div>
         </section>
 
-        <section class="view" id="view-treinos"><div class="page-title"><p class="eyebrow">BIBLIOTECA DE TREINOS</p><h1>Treine do seu jeito.</h1><p class="subheading">Explore modalidades para todos os momentos e níveis.</p></div><div class="filter-row"><button class="filter active">Todos</button><button class="filter">Força</button><button class="filter">Cardio</button><button class="filter">Mobilidade</button><button class="filter">Em casa</button></div><div class="all-workouts"><article class="wide-workout"><div class="workout-visual strength"><span class="visual-label">RECOMENDADO</span></div><div><p class="card-kicker">FORÇA · INICIANTE · 45 MIN</p><h2>Full body express</h2><p>Uma sessão completa para ativar todos os grupos musculares.</p><button class="primary-button small">Começar treino <span>→</span></button></div></article><article class="wide-workout"><div class="workout-visual running"></div><div><p class="card-kicker">CARDIO · INTERMEDIÁRIO · 30 MIN</p><h2>Corrida intervalada</h2><p>Alterne intensidade e ganhe condicionamento de forma gradual.</p><button class="primary-button small">Começar treino <span>→</span></button></div></article><article class="wide-workout"><div class="workout-visual yoga"></div><div><p class="card-kicker">MOBILIDADE · TODOS OS NÍVEIS · 20 MIN</p><h2>Flow para começar</h2><p>Respiração e movimento para acordar o corpo.</p><button class="primary-button small">Começar treino <span>→</span></button></div></article></div></section>
+        <!-- ==========================================
+             VIEW 2: BIBLIOTECA DE TREINOS
+             ========================================== -->
+        <section class="view" id="view-treinos">
+          <div class="page-title">
+            <p class="eyebrow">MODALIDADES &amp; INTENSIDADE</p>
+            <h1>Treine no seu melhor estilo.</h1>
+            <p class="subheading">Selecione uma modalidade, ajuste a duração e execute passo a passo.</p>
+          </div>
 
-        <section class="view" id="view-calendario"><div class="page-title"><p class="eyebrow">ACOMPANHE SUA JORNADA</p><h1>Seu calendário.</h1><p class="subheading">Marque os dias em que treinou e mantenha sua sequência viva.</p></div><div class="calendar-layout"><section class="panel full-calendar-panel"><div class="calendar-month"><button class="month-arrow" id="prevMonth">←</button><strong id="calendarTitle">Setembro 2026</strong><button class="month-arrow" id="nextMonth">→</button></div><div class="full-weekdays"><span>SEG</span><span>TER</span><span>QUA</span><span>QUI</span><span>SEX</span><span>SÁB</span><span>DOM</span></div><div class="full-calendar-days" id="fullCalendar"></div><p class="calendar-tip">Clique em um dia para marcar ou desmarcar um treino.</p></section><aside class="panel calendar-summary"><p class="eyebrow">RESUMO DO MÊS</p><div class="big-number"><strong id="monthCount">0</strong><span>treinos<br>marcados</span></div><div class="summary-line"><span>Meta mensal</span><strong>24</strong></div><div class="progress large"><span id="monthProgress"></span></div><div class="summary-line muted-line"><span>Melhor sequência</span><strong>12 dias</strong></div><div class="quote">“A consistência constrói o resultado que a motivação começa.”</div></aside></div></section>
+          <!-- BARRA DE PESQUISA E FILTROS -->
+          <div class="workout-controls-bar">
+            <div class="search-input-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="workoutSearchInput" placeholder="Buscar treino por nome ou músculo..." />
+            </div>
 
-        <section class="view" id="view-configuracoes"><div class="page-title"><p class="eyebrow">PREFERÊNCIAS</p><h1>Configurações.</h1><p class="subheading">Ajuste sua experiência no Fit.IA.</p></div><div class="panel settings-panel"><div class="setting-row"><div><strong>Notificações de treino</strong><p>Receba um lembrete quando estiver na hora de treinar.</p></div><button class="toggle on"><i></i></button></div><div class="setting-row"><div><strong>Resumo semanal</strong><p>Veja sua evolução e constância toda semana.</p></div><button class="toggle on"><i></i></button></div><div class="setting-row"><div><strong>Unidade de medida</strong><p>Escolha como prefere acompanhar seus dados.</p></div><button class="select-button">Quilogramas <span>⌄</span></button></div></div></section>
+            <div class="filter-row">
+              <button class="filter active" data-filter="Todos">Todos</button>
+              <button class="filter" data-filter="Força">Força</button>
+              <button class="filter" data-filter="Cardio">Cardio</button>
+              <button class="filter" data-filter="Mobilidade">Mobilidade</button>
+              <button class="filter" data-filter="Em casa">Em casa</button>
+            </div>
+          </div>
+
+          <!-- LISTA COMPLETA DE TREINOS -->
+          <div class="all-workouts" id="allWorkoutsList">
+            <!-- Renderizado dinamicamente via JS com dados do /api/workouts -->
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 3: CALENDÁRIO COMPLETO
+             ========================================== -->
+        <section class="view" id="view-calendario">
+          <div class="page-title">
+            <p class="eyebrow">SEU MAPA DE DISCIPLINA</p>
+            <h1>Calendário de constância.</h1>
+            <p class="subheading">Clique em qualquer dia para marcar ou desmarcar sua sessão de treino.</p>
+          </div>
+
+          <div class="calendar-layout">
+            <section class="panel full-calendar-panel">
+              <div class="calendar-month">
+                <button class="month-arrow" id="prevMonth" aria-label="Mês anterior">←</button>
+                <strong id="calendarTitle">Setembro 2026</strong>
+                <button class="month-arrow" id="nextMonth" aria-label="Próximo mês">→</button>
+              </div>
+
+              <div class="full-weekdays">
+                <span>SEGUNDA</span><span>TERÇA</span><span>QUARTA</span><span>QUINTA</span><span>SEXTA</span><span>SÁBADO</span><span>DOMINGO</span>
+              </div>
+
+              <div class="full-calendar-days" id="fullCalendar"></div>
+
+              <div class="calendar-legend">
+                <div class="legend-item"><span class="legend-dot done"></span> Treino concluído</div>
+                <div class="legend-item"><span class="legend-dot today"></span> Hoje</div>
+                <div class="legend-item"><span class="legend-dot empty"></span> Dia de descanso</div>
+              </div>
+            </section>
+
+            <!-- RESUMO LATERAL DO CALENDÁRIO -->
+            <aside class="panel calendar-summary">
+              <p class="eyebrow">RESUMO DO MÊS</p>
+              <div class="big-number">
+                <strong id="monthCount">0</strong>
+                <span>treinos<br>concluídos</span>
+              </div>
+
+              <div class="summary-line">
+                <span>Meta do mês</span>
+                <strong id="summaryGoalNumber">24 treinos</strong>
+              </div>
+
+              <div class="progress large">
+                <span id="monthProgress" style="width: 0%"></span>
+              </div>
+
+              <div class="summary-line muted-line">
+                <span>Melhor sequência</span>
+                <strong id="summaryStreakNumber">12 dias seguidos</strong>
+              </div>
+
+              <button class="primary-button full" id="btnMarkTodayLarge" style="margin-top: 18px;">
+                <span>✓</span> Registrar treino de hoje
+              </button>
+
+              <div class="quote">
+                “A consistência constrói o resultado que a motivação começa.”
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 4: CONFIGURAÇÕES
+             ========================================== -->
+        <section class="view" id="view-configuracoes">
+          <div class="page-title">
+            <p class="eyebrow">PERSONALIZAÇÃO</p>
+            <h1>Configurações da sua conta.</h1>
+            <p class="subheading">Ajuste lembretes, metas e preferências do Fit.IA.</p>
+          </div>
+
+          <div class="panel settings-panel">
+            <div class="setting-row">
+              <div>
+                <strong>Lembretes diários de treino</strong>
+                <p>Receba um aviso inteligente 1 hora antes do seu horário habitual.</p>
+              </div>
+              <button class="toggle on" id="toggleReminders" aria-label="Alternar lembretes"><i></i></button>
+            </div>
+
+            <div class="setting-row">
+              <div>
+                <strong>Resumo semanal de constância</strong>
+                <p>Receba um balanço do seu gasto calórico e frequência todo domingo.</p>
+              </div>
+              <button class="toggle on" id="toggleWeeklyReport" aria-label="Alternar resumo semanal"><i></i></button>
+            </div>
+
+            <div class="setting-row">
+              <div>
+                <strong>Meta de treinos mensal</strong>
+                <p>Escolha a quantidade de treinos para o cálculo da sua barra de progresso.</p>
+              </div>
+              <select class="settings-select" id="settingMonthlyGoal">
+                <option value="16">16 treinos (4x / semana)</option>
+                <option value="20">20 treinos (5x / semana)</option>
+                <option value="24" selected>24 treinos (6x / semana - Padrão)</option>
+                <option value="28">28 treinos (Atleta dedicado)</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <div>
+                <strong>Unidade de medida</strong>
+                <p>Formato de peso e cargas na plataforma.</p>
+              </div>
+              <select class="settings-select" id="settingUnit">
+                <option value="kg" selected>Quilogramas (kg)</option>
+                <option value="lbs">Libras (lbs)</option>
+              </select>
+            </div>
+
+            <div class="setting-actions">
+              <button class="primary-button" id="btnSaveSettings">Salvar preferências</button>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
 
-    <div class="modal-backdrop open" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <!-- ==========================================
+         MODAL DE AUTENTICAÇÃO (LOGIN / REGISTRO)
+         ========================================== -->
+    <div class="modal-backdrop" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
       <div class="login-modal">
         <button class="close-modal" id="closeModal" aria-label="Fechar janela de autenticação">×</button>
 
-        <!-- LADO ESQUERDO: APRESENTAÇÃO FIT.IA -->
+        <!-- LADO ESQUERDO: VITRINE DA MARCA FIT.IA -->
         <aside class="login-showcase">
           <div class="showcase-decor" aria-hidden="true">
             <span class="shape shape-top"></span>
@@ -58,7 +458,7 @@
 
           <div class="showcase-content">
             <div class="showcase-badge">
-              <span class="spark">✦</span> Fit.IA Treinos &amp; Hábitos
+              <span class="spark">✦</span> Fit.IA Plataforma Inteligente
             </div>
 
             <div class="showcase-brand">
@@ -107,7 +507,7 @@
 
         <!-- LADO DIREITO: FORMULÁRIOS DE ENTRAR E CADASTRAR -->
         <div class="login-content">
-          <!-- ABAS DE NAVEGAÇÃO ENTRE LOGIN E CADASTRO -->
+          <!-- ABAS DE NAVEGAÇÃO -->
           <div class="auth-tabs" role="tablist" aria-label="Opções de autenticação">
             <button type="button" class="auth-tab active" id="tabLogin" role="tab" aria-selected="true" aria-controls="panelLogin">
               Entrar
@@ -236,7 +636,90 @@
         </div>
       </div>
     </div>
-    <div class="toast" id="toast">Treino marcado! Sua constância agradece. ✦</div>
+
+    <!-- ==========================================
+         MODAL DE EXECUÇÃO DO TREINO (WORKOUT RUNNER)
+         ========================================== -->
+    <div class="modal-backdrop" id="workoutModal" role="dialog" aria-modal="true" aria-labelledby="workoutModalTitle">
+      <div class="workout-runner-modal">
+        <button class="close-modal" id="closeWorkoutModal" aria-label="Fechar treino">×</button>
+        <div class="runner-header">
+          <span class="badge-category" id="workoutModalCategory">FORÇA</span>
+          <h2 id="workoutModalTitle">Full body express</h2>
+          <p id="workoutModalDesc">Sessão completa para ativar os principais grupos musculares.</p>
+        </div>
+
+        <div class="runner-timer-box">
+          <div class="timer-display" id="workoutTimerDisplay">00:00</div>
+          <div class="timer-controls">
+            <button class="timer-btn primary" id="btnToggleTimer">▶ Iniciar cronômetro</button>
+            <button class="timer-btn secondary" id="btnResetTimer">Reiniciar</button>
+          </div>
+        </div>
+
+        <div class="runner-exercises">
+          <h3>Exercícios da sessão:</h3>
+          <div class="exercise-checklist" id="workoutExercisesList">
+            <!-- Gerado dinamicamente -->
+          </div>
+        </div>
+
+        <div class="runner-footer">
+          <button class="primary-button full" id="btnFinishWorkout">
+            <span>✓</span> Concluir Treino e Registrar Check-in
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL FIT.IA PRO
+         ========================================== -->
+    <div class="modal-backdrop" id="proModal" role="dialog" aria-modal="true">
+      <div class="pro-modal-card">
+        <button class="close-modal" id="closeProModal" aria-label="Fechar">×</button>
+        <div class="pro-modal-sparkle">✦</div>
+        <h2>Desbloqueie o Fit.IA Pro</h2>
+        <p class="pro-modal-copy">Evolua mais rápido com inteligência artificial e acompanhamento avançado.</p>
+
+        <div class="pro-features-grid">
+          <div class="pro-feature-item">
+            <span class="feat-icon">🤖</span>
+            <div>
+              <strong>Treinos automáticos por IA</strong>
+              <small>Planos gerados dinamicamente para os seus equipamentos e tempo disponível.</small>
+            </div>
+          </div>
+
+          <div class="pro-feature-item">
+            <span class="feat-icon">🥗</span>
+            <div>
+              <strong>Calculadora de macros &amp; dieta</strong>
+              <small>Calorias e macronutrientes ideais para hipertrofia ou queima de gordura.</small>
+            </div>
+          </div>
+
+          <div class="pro-feature-item">
+            <span class="feat-icon">📈</span>
+            <div>
+              <strong>Gráficos avançados de evolução</strong>
+              <small>Carga progressiva, volume semanal e estimativa de RM.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="pro-pricing-box">
+          <div class="price-value">R$ 29,90 <small>/mês</small></div>
+          <span class="price-badge">7 DIAS GRÁTIS</span>
+        </div>
+
+        <button class="primary-button full" id="btnTryPro">Experimentar 7 dias grátis <span>→</span></button>
+      </div>
+    </div>
+
+    <!-- MENSAGEM TOAST GLOBAL -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
     <script src="app.js"></script>
   </body>
 </html>

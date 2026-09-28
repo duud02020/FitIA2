@@ -30,9 +30,12 @@ function readBody(req) { return new Promise((resolve, reject) => { let raw = '';
 function requireUser(req, res) { const user = currentUser(req); if (!user) { send(res, 401, { error: 'Faça login para continuar.' }); return null; } return user; }
 
 const workouts = [
-  { id: 'full-body', title: 'Full body express', category: 'Força', duration: 45, level: 'Iniciante' },
-  { id: 'intervalada', title: 'Corrida intervalada', category: 'Cardio', duration: 30, level: 'Intermediário' },
-  { id: 'flow', title: 'Flow para começar', category: 'Mobilidade', duration: 20, level: 'Todos os níveis' }
+  { id: 'full-body', title: 'Full body express', category: 'Força', duration: 45, level: 'Iniciante', calories: 350, description: 'Sessão completa para ativar os principais grupos musculares com peso corporal e halteres.', exercises: ['Agachamento livre (3x12)', 'Flexão de braço (3x10)', 'Remada curvada (3x12)', 'Prancha isométrica (3x40s)'] },
+  { id: 'intervalada', title: 'Corrida intervalada', category: 'Cardio', duration: 30, level: 'Intermediário', calories: 320, description: 'Alterne tiros de alta intensidade com trote leve para queimar gordura e turbinar o fôlego.', exercises: ['Aquecimento trote leve (5 min)', 'Tiros de 45s a 85% FCM (8 séries)', 'Recuperação ativa (60s entre tiros)', 'Desaquecimento e respiração (5 min)'] },
+  { id: 'flow', title: 'Flow matinal para começar', category: 'Mobilidade', duration: 20, level: 'Todos os níveis', calories: 120, description: 'Sequência dinâmica de respiração e flexibilidade para destravar as articulações e despertar o corpo.', exercises: ['Gato e camelo (10 repetições)', 'Cão olhando para baixo (1 min)', 'Postura da cobra suave (8 respirações)', 'Torção de coluna deitado (30s cada lado)'] },
+  { id: 'core-blast', title: 'Core & Abdômen blindado', category: 'Em casa', duration: 25, level: 'Iniciante', calories: 190, description: 'Fortalecimento do abdômen e lombar sem nenhum equipamento necessário.', exercises: ['Abdominal infra (3x15)', 'Prancha lateral (3x30s cada lado)', 'Bicycle crunch (3x20)', 'Superman lombar (3x12)'] },
+  { id: 'hiit-burn', title: 'HIIT queima extrema', category: 'Cardio', duration: 25, level: 'Avançado', calories: 380, description: 'Circuito metabólico com intervalos curtos de descanso para acelerar o metabolismo.', exercises: ['Burpees (40s ativo / 20s descanso)', 'Mountain climbers (40s / 20s)', 'Jumping jacks com agachamento (40s / 20s)', 'High knees corrida estacionária (40s / 20s)'] },
+  { id: 'pernas-gluteos', title: 'Pernas & Glúteos em foco', category: 'Força', duration: 40, level: 'Intermediário', calories: 310, description: 'Foco total no membro inferior: quadríceps, posteriores e estabilidade de joelhos.', exercises: ['Afundo estático (3x12 cada perna)', 'Elevação pélvica no chão (3x15)', 'Agachamento búlgaro (3x10 cada)', 'Panturrilha em pé (4x20)'] }
 ];
 
 async function api(req, res, url) {
