@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Pulse — seu espaço para treinos, evolução e constância." />
-    <title>Pulse | Treine no seu ritmo</title>
+    <meta name="description" content="Fit.IA — seu espaço para treinos, evolução e constância." />
+    <title>Fit.IA | Treine no seu ritmo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
@@ -13,7 +13,7 @@
   <body>
     <div class="app-shell">
       <aside class="sidebar">
-        <a class="brand" href="#inicio" aria-label="Pulse início"><span class="brand-mark">P</span><span>pulse<span class="brand-dot">.</span></span></a>
+        <a class="brand" href="#inicio" aria-label="Fit.IA início"><span class="brand-mark">F</span><span>Fit<span class="brand-dot">.IA</span></span></a>
         <div class="sidebar-label">Menu principal</div>
         <nav class="main-nav" aria-label="Navegação principal">
           <a class="nav-link active" href="#inicio" data-route="inicio"><span class="nav-icon">⌂</span>Visão geral</a>
@@ -21,7 +21,7 @@
           <a class="nav-link" href="#calendario" data-route="calendario"><span class="nav-icon">▣</span>Calendário</a>
         </nav>
         <div class="sidebar-spacer"></div>
-        <div class="pro-card"><span class="spark">✦</span><strong>Desbloqueie seu potencial</strong><p>Tenha acesso a planos personalizados.</p><button class="text-button">Conhecer Pulse Pro <span>→</span></button></div>
+        <div class="pro-card"><span class="spark">✦</span><strong>Desbloqueie seu potencial</strong><p>Tenha acesso a planos personalizados.</p><button class="text-button">Conhecer Fit.IA Pro <span>→</span></button></div>
         <a class="nav-link muted" href="#configuracoes" data-route="configuracoes"><span class="nav-icon">⚙</span>Configurações</a>
         <button class="profile-mini" id="profileButton"><span class="avatar">JS</span><span class="profile-info"><strong>João Silva</strong><small>Plano gratuito</small></span><span class="more">•••</span></button>
       </aside>
@@ -41,11 +41,11 @@
 
         <section class="view" id="view-calendario"><div class="page-title"><p class="eyebrow">ACOMPANHE SUA JORNADA</p><h1>Seu calendário.</h1><p class="subheading">Marque os dias em que treinou e mantenha sua sequência viva.</p></div><div class="calendar-layout"><section class="panel full-calendar-panel"><div class="calendar-month"><button class="month-arrow" id="prevMonth">←</button><strong id="calendarTitle">Setembro 2026</strong><button class="month-arrow" id="nextMonth">→</button></div><div class="full-weekdays"><span>SEG</span><span>TER</span><span>QUA</span><span>QUI</span><span>SEX</span><span>SÁB</span><span>DOM</span></div><div class="full-calendar-days" id="fullCalendar"></div><p class="calendar-tip">Clique em um dia para marcar ou desmarcar um treino.</p></section><aside class="panel calendar-summary"><p class="eyebrow">RESUMO DO MÊS</p><div class="big-number"><strong id="monthCount">0</strong><span>treinos<br>marcados</span></div><div class="summary-line"><span>Meta mensal</span><strong>24</strong></div><div class="progress large"><span id="monthProgress"></span></div><div class="summary-line muted-line"><span>Melhor sequência</span><strong>12 dias</strong></div><div class="quote">“A consistência constrói o resultado que a motivação começa.”</div></aside></div></section>
 
-        <section class="view" id="view-configuracoes"><div class="page-title"><p class="eyebrow">PREFERÊNCIAS</p><h1>Configurações.</h1><p class="subheading">Ajuste sua experiência no Pulse.</p></div><div class="panel settings-panel"><div class="setting-row"><div><strong>Notificações de treino</strong><p>Receba um lembrete quando estiver na hora de treinar.</p></div><button class="toggle on"><i></i></button></div><div class="setting-row"><div><strong>Resumo semanal</strong><p>Veja sua evolução e constância toda semana.</p></div><button class="toggle on"><i></i></button></div><div class="setting-row"><div><strong>Unidade de medida</strong><p>Escolha como prefere acompanhar seus dados.</p></div><button class="select-button">Quilogramas <span>⌄</span></button></div></div></section>
+        <section class="view" id="view-configuracoes"><div class="page-title"><p class="eyebrow">PREFERÊNCIAS</p><h1>Configurações.</h1><p class="subheading">Ajuste sua experiência no Fit.IA.</p></div><div class="panel settings-panel"><div class="setting-row"><div><strong>Notificações de treino</strong><p>Receba um lembrete quando estiver na hora de treinar.</p></div><button class="toggle on"><i></i></button></div><div class="setting-row"><div><strong>Resumo semanal</strong><p>Veja sua evolução e constância toda semana.</p></div><button class="toggle on"><i></i></button></div><div class="setting-row"><div><strong>Unidade de medida</strong><p>Escolha como prefere acompanhar seus dados.</p></div><button class="select-button">Quilogramas <span>⌄</span></button></div></div></section>
       </main>
     </div>
 
-    <div class="modal-backdrop" id="loginModal"><div class="login-modal"><button class="close-modal" id="closeModal">×</button><div class="login-brand"><span class="brand-mark">P</span> pulse<span class="brand-dot">.</span></div><p class="eyebrow">BEM-VINDO DE VOLTA</p><h2>Continue sua jornada.</h2><p class="modal-copy">Entre para acompanhar seu progresso de onde estiver.</p><form id="loginForm"><label>Email<input type="email" placeholder="voce@email.com" required /></label><label>Senha <a href="#">Esqueci minha senha</a><input type="password" placeholder="••••••••" required /></label><button class="primary-button full" type="submit">Entrar <span>→</span></button></form><div class="divider"><span>ou continue com</span></div><button class="social-button">G <span>Continuar com Google</span></button><p class="signup">Ainda não tem conta? <a href="#">Criar uma agora</a></p></div></div>
+    <div class="modal-backdrop open" id="loginModal"><div class="login-modal"><button class="close-modal" id="closeModal">×</button><div class="login-showcase"><span class="showcase-kicker">FIT.IA / SUA EVOLUÇÃO</span><strong>Movimente<br />sua melhor<br /><em>versão.</em></strong><p>Treinos inteligentes para uma rotina mais leve, forte e consistente.</p><span class="showcase-orbit">✦</span></div><div class="login-content"><div class="login-brand"><span class="brand-mark">F</span> Fit<span class="brand-dot">.IA</span></div><p class="eyebrow">BEM-VINDO DE VOLTA</p><h2>Continue sua jornada.</h2><p class="modal-copy">Entre para acompanhar seu progresso de onde estiver.</p><form id="loginForm"><label>Email<input type="email" placeholder="voce@email.com" required /></label><label>Senha <a href="#">Esqueci minha senha</a><input type="password" placeholder="••••••••" required /></label><button class="primary-button full" type="submit">Entrar <span>→</span></button></form><div class="divider"><span>ou continue com</span></div><button class="social-button">G <span>Continuar com Google</span></button><p class="signup">Ainda não tem conta? <a href="#">Criar uma agora</a></p></div></div></div>
     <div class="toast" id="toast">Treino marcado! Sua constância agradece. ✦</div>
     <script src="app.js"></script>
   </body>
